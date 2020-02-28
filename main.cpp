@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <cstdio>
+#include <cstdint>
 
 int main(int argc, char** argv) {
   printf("Initializing SDL...\n");
@@ -16,7 +17,7 @@ int main(int argc, char** argv) {
     printf("SDL_CreateWindow error: %s\n",SDL_GetError());
     return 1;
   }
-
+  uint8_t col = 0x00;
   bool quit = false;                                      
   SDL_Event e;                                            
   while (!quit) {                                         
@@ -27,8 +28,9 @@ int main(int argc, char** argv) {
     }
 
     surface = SDL_GetWindowSurface(window);
-    SDL_FillRect(surface, nullptr, SDL_MapRGB(surface->format, 0xFF, 0xFF, 0xFF));
-    SDL_UpdateWindowSurface(window);                                                   
+    SDL_FillRect(surface, nullptr, SDL_MapRGB(surface->format, 0xFF, col, 0xFF));
+    SDL_UpdateWindowSurface(window);
+    col = ++col % 255;
   }
 
   printf("Exiting gracefully... :)\n");
