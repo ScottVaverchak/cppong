@@ -2,23 +2,49 @@
 #include <cstdio>
 #include <cstdint>
 
-int main(int argc, char** argv) {
-  printf("Initializing SDL...\n");
-  
-  if(SDL_Init(SDL_INIT_VIDEO) != 0) {
-    printf("SDL_Init error: %s\n",SDL_GetError());
-    return 1;
+
+int SDL_ErrorCheck(int code) {
+  if(code != 0) {
+    printf("SDL error: %s\n", SDL_GetError());
+    abort();
   }
 
-  SDL_Window *window = SDL_CreateWindow("cppong", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 400, 400, SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI);
+  return code;
+}
+
+template<typename T>
+T SDL_ErrorCheck(T f) {
+  if(f == nullptr) {
+    printf("SDL error: %s\n", SDL_GetError());
+    abort();
+  }
+
+  return f;
+}
+
+int main(int argc, char** argv) {
+  printf("Initializing SDL...\n");
+  SDL_ErrorCheck(SDL_Init(SDL_INIT_VIDEO));
+  // if(SDL_Init(SDL_INIT_VIDEO) != 0) {
+  //   printf("SDL_Init error: %s\n",SDL_GetError());
+  //   return 1;
+  // }
+
+  SDL_Window *window = SDL_ErrorCheck(SDL_CreateWindow("cppong", 
+                                                        SDL_WINDOWPOS_UNDEFINED, 
+                                                        SDL_WINDOWPOS_UNDEFINED, 
+                                                        400, 400, 
+                                                        SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI));
   SDL_Surface *surface;
 
   if(window == nullptr) {
     printf("SDL_CreateWindow error: %s\n",SDL_GetError());
     return 1;
   }
+  
   uint8_t col = 0x00;
-  bool quit = false;                                      
+  bool quit = false;         
+
   SDL_Event e;                                            
   while (!quit) {                                         
     while (SDL_PollEvent(&e)) {                         
