@@ -13,23 +13,19 @@ int SDL_ErrorCheck(int code) {
 }
 
 template<typename T>
-T SDL_ErrorCheck(T f) {
-  if(f == nullptr) {
+T *SDL_ErrorCheck(T *ptr) {
+  if(ptr == nullptr) {
     printf("SDL error: %s\n", SDL_GetError());
     abort();
   }
 
-  return f;
+  return ptr;
 }
 
 int main(int argc, char** argv) {
   printf("Initializing SDL...\n");
+  
   SDL_ErrorCheck(SDL_Init(SDL_INIT_VIDEO));
-  // if(SDL_Init(SDL_INIT_VIDEO) != 0) {
-  //   printf("SDL_Init error: %s\n",SDL_GetError());
-  //   return 1;
-  // }
-
   SDL_Window *window = SDL_ErrorCheck(SDL_CreateWindow("cppong", 
                                                         SDL_WINDOWPOS_UNDEFINED, 
                                                         SDL_WINDOWPOS_UNDEFINED, 
