@@ -38,7 +38,8 @@ int main(int argc, char** argv) {
     return 1;
   }
   
-  uint8_t col = 0x00;
+  uint8_t col = 0x01;
+  int8_t direction = 1;
   bool quit = false;         
 
   SDL_Event e;                                            
@@ -50,9 +51,13 @@ int main(int argc, char** argv) {
     }
 
     surface = SDL_GetWindowSurface(window);
-    SDL_FillRect(surface, nullptr, SDL_MapRGB(surface->format, 0xFF, col, 0xFF));
+    SDL_FillRect(surface, nullptr, SDL_MapRGB(surface->format, 0x0F, col, 0x0F));
     SDL_UpdateWindowSurface(window);
-    col = ++col % 255;
+    if(col > 254 || col < 1) {
+        direction *= -1;
+        printf("HEY BOYS! FLIPPERS! direction: %i, col: %i\n", direction, col);
+    }
+    col += direction;
   }
 
   printf("Exiting gracefully... :)\n");
