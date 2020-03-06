@@ -31,16 +31,16 @@ int main(int argc, char** argv) {
                                                           SDL_WINDOWPOS_UNDEFINED, 
                                                           400, 400, 
                                                           SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI));
-    SDL_Surface *surface;
 
     if(window == nullptr) {
         printf("SDL_CreateWindow error: %s\n",SDL_GetError());
         return 1;
     }
   
-    uint8_t col = 0x01;
+    SDL_Renderer *renderer = SDL_ErrorCheck(SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED));
+    
     bool quit = false;         
-
+    SDL_Rect rectm = {0, 0, 100, 100};
     SDL_Event e;                                            
     while (!quit) {                                         
         while (SDL_PollEvent(&e)) {                         
@@ -49,9 +49,12 @@ int main(int argc, char** argv) {
             }                                               
         }
 
-        surface = SDL_GetWindowSurface(window);
-        SDL_FillRect(surface, nullptr, SDL_MapRGB(surface->format, 0x0F, col, 0x0F));
-        SDL_UpdateWindowSurface(window);
+        SDL_ErrorCheck(SDL_RenderClear(renderer));
+        SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x00, 0xFF, 0x00, 0xFF));
+        SDL_ErrorCheck(SDL_RenderDrawRect(renderer, &rectm));
+        SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF));
+
+        SDL_RenderPresent(renderer);
     }
 
     printf("Exiting gracefully... :)\n");
