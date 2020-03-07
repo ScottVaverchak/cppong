@@ -1,17 +1,10 @@
 CXX = clang++
 # SDL = -framework SDL2
-SDL = -I/usr/local/include -L/usr/local/lib -lSDL2
-CXXFLAGS = -Wall -c -std=c++17 -stdlib=libc++
-LDFLAGS = $(SDL)
-EXE = cppong
+PKGS=sdl2
+CXXFLAGS=-Wall -pedantic -std=c++17 -ggdb -stdlib=libc++ $(shell pkg-config --cflags $(PKGS))
+LIBS=$(shell pkg-config --libs $(PKGS))
 
-all: $(EXE)
+cppong: main.cpp
+	$(CXX) $(CXXFLAGS) -o cppong main.cpp $(LIBS)
 
-$(EXE): main.o
-	$(CXX) $(LDFLAGS) $< -o $@
 
-main.o: main.cpp
-	$(CXX) $(CXXFLAGS) $< -o $@
-
-clean:
-	rm *.o && rm $(EXE)

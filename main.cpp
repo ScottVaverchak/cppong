@@ -31,11 +31,6 @@ int main(int argc, char** argv) {
                                                           SDL_WINDOWPOS_UNDEFINED, 
                                                           400, 400, 
                                                           SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI));
-
-    if(window == nullptr) {
-        printf("SDL_CreateWindow error: %s\n",SDL_GetError());
-        return 1;
-    }
   
     SDL_Renderer *renderer = SDL_ErrorCheck(SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED));
     const int player_w = 25;
@@ -45,6 +40,7 @@ int main(int argc, char** argv) {
     bool quit = false;         
     SDL_Rect player = {player_x, 10, player_w, player_h};
     SDL_Event e;
+
     while (!quit) {
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
@@ -59,7 +55,6 @@ int main(int argc, char** argv) {
         } else if (keyboard_state[SDL_SCANCODE_DOWN]) {
             player.y += 1;
         }
-
 
         SDL_ErrorCheck(SDL_RenderClear(renderer));
         SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x00, 0xFF, 0x00, 0xFF));
