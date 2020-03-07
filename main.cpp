@@ -38,29 +38,32 @@ int main(int argc, char** argv) {
     }
   
     SDL_Renderer *renderer = SDL_ErrorCheck(SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED));
-    
+    const int player_w = 25;
+    const int player_h = 100;
+    const int player_x = 10;
+
     bool quit = false;         
-    SDL_Rect rectm = {0, 0, 100, 100};
-    SDL_Event e;                                            
-    while (!quit) {                                         
-        while (SDL_PollEvent(&e)) {                         
-            if (e.type == SDL_QUIT) {                       
+    SDL_Rect player = {player_x, 10, player_w, player_h};
+    SDL_Event e;
+    while (!quit) {
+        while (SDL_PollEvent(&e)) {
+            if (e.type == SDL_QUIT) {
                 quit = true;
-            }                                               
+            }
         }
 
         const Uint8 *keyboard_state = SDL_GetKeyboardState(NULL);
 
         if(keyboard_state[SDL_SCANCODE_UP]) {
-            rectm.y -= 1;
+            player.y -= 1;
         } else if (keyboard_state[SDL_SCANCODE_DOWN]) {
-            rectm.y += 1;
+            player.y += 1;
         }
 
 
         SDL_ErrorCheck(SDL_RenderClear(renderer));
         SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x00, 0xFF, 0x00, 0xFF));
-        SDL_ErrorCheck(SDL_RenderDrawRect(renderer, &rectm));
+        SDL_ErrorCheck(SDL_RenderDrawRect(renderer, &player));
         SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF));
 
         SDL_RenderPresent(renderer);
