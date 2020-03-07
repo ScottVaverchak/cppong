@@ -49,12 +49,22 @@ int main(int argc, char** argv) {
             }                                               
         }
 
+        const Uint8 *keyboard_state = SDL_GetKeyboardState(NULL);
+
+        if(keyboard_state[SDL_SCANCODE_UP]) {
+            rectm.y -= 1;
+        } else if (keyboard_state[SDL_SCANCODE_DOWN]) {
+            rectm.y += 1;
+        }
+
+
         SDL_ErrorCheck(SDL_RenderClear(renderer));
         SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x00, 0xFF, 0x00, 0xFF));
         SDL_ErrorCheck(SDL_RenderDrawRect(renderer, &rectm));
         SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF));
 
         SDL_RenderPresent(renderer);
+
     }
 
     printf("Exiting gracefully... :)\n");
