@@ -93,19 +93,24 @@ int main(int argc, char** argv) {
     SDL_Renderer *renderer = SDL_ErrorCheck(SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED));
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
 
+    SDL_Rect world = {GAMEAREA_X, GAMEAREA_Y, GAMEAREA_W, GAMEAREA_H};
+    SDL_Rect player = {PLAYER_X, PLAYER_Y, PLAYER_W, PLAYER_H};
+
+    // Font below
     TTF_ErrorCheck(TTF_Init());    
     TTF_Font *main_font = TTF_ErrorCheck(TTF_OpenFont("uni0553-webfont.ttf", 32));
     SDL_Surface *font_surface = TTF_ErrorCheck(TTF_RenderText_Blended(main_font, "cppong++", {255, 0, 255}));
-    SDL_Texture *font_texture = SDL_CreateTextureFromSurface(renderer, font_surface);
+    SDL_Texture *font_texture = SDL_ErrorCheck(SDL_CreateTextureFromSurface(renderer, font_surface));
     
     SDL_FreeSurface(font_surface);
 
     int font_width, font_height;
-    SDL_QueryTexture(font_texture, nullptr, nullptr, &font_width, &font_height);
+    SDL_ErrorCheck(SDL_QueryTexture(font_texture, nullptr, nullptr, &font_width, &font_height));
     SDL_Rect font_rect = { (WINDOW_W / 2) - (font_width / 2), 0, font_width, font_height};
+    // Font fin.h
+
+
     bool quit = false;         
-    SDL_Rect world = {GAMEAREA_X, GAMEAREA_Y, GAMEAREA_W, GAMEAREA_H};
-    SDL_Rect player = {PLAYER_X, PLAYER_Y, PLAYER_W, PLAYER_H};
     SDL_Event e;
 
     Uint32 prev_dt = 1;
