@@ -37,6 +37,7 @@ int main(int argc, char** argv) {
     const int PLAYER_W = 25;
     const int PLAYER_H = 100;
     const int PLAYER_X = 10;
+    
 
     bool quit = false;         
     SDL_Rect player = {PLAYER_X, 10, PLAYER_W, PLAYER_H};
@@ -54,12 +55,15 @@ int main(int argc, char** argv) {
         }
 
         const uint8_t *keyboard_state = SDL_GetKeyboardState(NULL);
-
+        int8_t dy = 0;
         if(keyboard_state[SDL_SCANCODE_UP]) {
-            player.y -= 1;
+            dy = -1;
         } else if (keyboard_state[SDL_SCANCODE_DOWN]) {
-            player.y += 1;
+            dy = 1;
         }
+
+        if(player.y + dy >= 0 && (player.y + dy + player.h) < 400)
+            player.y += dy;
 
         SDL_ErrorCheck(SDL_RenderClear(renderer));
         SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x00, 0xFF, 0x00, 0xFF));
