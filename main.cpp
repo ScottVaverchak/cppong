@@ -32,6 +32,25 @@ T *SDL_ErrorCheck(T *ptr) {
     return ptr;
 }
 
+int TTF_ErrorCheck(int code) {
+    if(code != 0) {
+        printf("SDL TTF error: %s\n", TTF_GetError());
+        abort();
+    }
+
+    return code;
+}
+
+template<typename T>
+T *TTF_ErrorCheck(T *ptr) {
+    if(ptr == nullptr) {
+        printf("SDL TTF error: %s\n", TTF_GetError());
+        abort();
+    }
+
+    return ptr;
+}
+
 void draw_colored_rectangle(SDL_Renderer *renderer, SDL_Rect rect, uint32_t color) {
 
     // R G B A
@@ -74,7 +93,16 @@ int main(int argc, char** argv) {
     SDL_Renderer *renderer = SDL_ErrorCheck(SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED));
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
 
+    TTF_ErrorCheck(TTF_Init());    
+    TTF_Font *main_font = TTF_ErrorCheck(TTF_OpenFont("uni0553-webfont.ttf", 32));
+    SDL_Surface *font_surface = TTF_ErrorCheck(TTF_RenderText_Blended(main_font, "cppong++", {255, 0, 255}));
+    SDL_Texture *font_texture = SDL_CreateTextureFromSurface(renderer, font_surface);
+    
+    SDL_FreeSurface(font_surface);
 
+    int font_width, font_height;
+    SDL_QueryTexture(font_texture, nullptr, nullptr, &font_width, &font_height);
+    SDL_Rect font_rect = { (WINDOW_W / 2) - (font_width / 2), 0, font_width, font_height};
     bool quit = false;         
     SDL_Rect world = {GAMEAREA_X, GAMEAREA_Y, GAMEAREA_W, GAMEAREA_H};
     SDL_Rect player = {PLAYER_X, PLAYER_Y, PLAYER_W, PLAYER_H};
@@ -106,7 +134,8 @@ int main(int argc, char** argv) {
         SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x22, 0x22, 0x22, 0xFF));
         draw_colored_rectangle(renderer, player, 0x0000FFFF);
         draw_colored_rectangle(renderer, world, 0xFF0000FF);
-
+        
+        SDL_RenderCopy(renderer, font_texture, nullptr, &font_rect);
         SDL_RenderPresent(renderer);
         
         const Uint32 dt = SDL_GetTicks() - begin;
@@ -116,6 +145,8 @@ int main(int argc, char** argv) {
 
     printf("Exiting gracefully... :)\n");
     SDL_DestroyWindow(window);
+    TTF_CloseFont(main_font);
+    TTF_Quit();
     SDL_Quit();
     return 0;
 }

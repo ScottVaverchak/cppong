@@ -1,6 +1,6 @@
 CXX = clang++
 # SDL = -framework SDL2
-PKGS=sdl2 sdl_ttf
+PKGS=sdl2 sdl2_ttf
 CXXFLAGS=-Wall -pedantic -std=c++17 -ggdb -stdlib=libc++ $(shell pkg-config --cflags $(PKGS))
 LIBS=$(shell pkg-config --libs $(PKGS))
 
