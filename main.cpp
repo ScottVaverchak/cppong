@@ -2,7 +2,6 @@
 #include <cstdio>
 #include <cstdint>
 
-
 int SDL_ErrorCheck(int code) {
     if(code != 0) {
         printf("SDL error: %s\n", SDL_GetError());
@@ -30,25 +29,31 @@ int main(int argc, char** argv) {
                                                           SDL_WINDOWPOS_UNDEFINED, 
                                                           SDL_WINDOWPOS_UNDEFINED, 
                                                           400, 400, 
-                                                          SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI));
+                                                          SDL_WINDOW_RESIZABLE));
   
-    SDL_Renderer *renderer = SDL_ErrorCheck(SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED));
-    const int player_w = 25;
-    const int player_h = 100;
-    const int player_x = 10;
+    SDL_Renderer *renderer = SDL_ErrorCheck(SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED));
+    SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
+
+    const int PLAYER_W = 25;
+    const int PLAYER_H = 100;
+    const int PLAYER_X = 10;
 
     bool quit = false;         
-    SDL_Rect player = {player_x, 10, player_w, player_h};
+    SDL_Rect player = {PLAYER_X, 10, PLAYER_W, PLAYER_H};
     SDL_Event e;
 
+    Uint32 prev_dt = 1;
+    
     while (!quit) {
+        Uint32 begin = SDL_GetTicks();
+
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
                 quit = true;
             }
         }
 
-        const Uint8 *keyboard_state = SDL_GetKeyboardState(NULL);
+        const uint8_t *keyboard_state = SDL_GetKeyboardState(NULL);
 
         if(keyboard_state[SDL_SCANCODE_UP]) {
             player.y -= 1;
@@ -60,9 +65,12 @@ int main(int argc, char** argv) {
         SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x00, 0xFF, 0x00, 0xFF));
         SDL_ErrorCheck(SDL_RenderDrawRect(renderer, &player));
         SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF));
-
+        
         SDL_RenderPresent(renderer);
-
+        
+        const Uint32 dt = SDL_GetTicks() - begin;
+        prev_dt = dt;
+        
     }
 
     printf("Exiting gracefully... :)\n");
