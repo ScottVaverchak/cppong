@@ -6,6 +6,7 @@
 #include <cassert>
 
 
+
 const int WINDOW_W = 800;
 const int WINDOW_H = 400;
 
@@ -111,10 +112,37 @@ int main(int argc, char** argv) {
     // Font fin.h
 
     // png fun begins here friend
-    png_image image_friend = {};
+    png_image image_friend;
+    memset(&image_friend, 0, sizeof(png_image));
+
     image_friend.version = PNG_IMAGE_VERSION;
-    png_image_begin_read_from_file(&image_friend, "RAM.png");
+    if(!png_image_begin_read_from_file(&image_friend, "RAM.png")) {
+        fprintf(stderr, "libpng errored reading RAM.png: %s", image_friend.message);
+        abort();
+    }
+
+    image_friend.format = PNG_FORMAT_RGBA;
+
+    uint32_t *pixel_friends = new uint32_t[image_friend.width * image_friend.height];
     
+    if (!png_image_finish_read(&image_friend, nullptr, pixel_friends, 0, nullptr)) {
+        fprintf(stderr, "libpng errored: %s", image_friend.message);
+        abort();
+    }
+
+    SDL_Surface *image_surface = SDL_ErrorCheck(SDL_CreateRGBSurfaceFrom(
+        pixel_friends, 
+        image_friend.width, 
+        image_friend.height, 
+        32,
+        image_friend.width * 4,
+        0x000000FF,
+        0x0000FF00,
+        0x00FF0000,
+        0xFF000000
+    ));
+
+    SDL_Texture *image_texture = SDL_ErrorCheck(SDL_CreateTextureFromSurface(renderer, image_surface));
     // png is big time done
 
     bool quit = false;         
@@ -143,8 +171,10 @@ int main(int argc, char** argv) {
             player.y += dy;
 
         SDL_ErrorCheck(SDL_RenderClear(renderer));
+        SDL_ErrorCheck(SDL_RenderCopy(renderer, image_texture, nullptr, &world));
         SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x22, 0x22, 0x22, 0xFF));
         draw_colored_rectangle(renderer, player, 0x0000FFFF);
+        SDL_ErrorCheck(SDL_RenderCopy(renderer, image_texture, nullptr, &player));
         draw_colored_rectangle(renderer, world, 0xFF0000FF);
         
         SDL_RenderCopy(renderer, font_texture, nullptr, &font_rect);
