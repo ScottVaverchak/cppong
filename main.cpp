@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <png.h>
 #include <cstdio>
 #include <cstdint>
 #include <cassert>
@@ -109,6 +110,12 @@ int main(int argc, char** argv) {
     SDL_Rect font_rect = { (WINDOW_W / 2) - (font_width / 2), 0, font_width, font_height};
     // Font fin.h
 
+    // png fun begins here friend
+    png_image image_friend = {};
+    image_friend.version = PNG_IMAGE_VERSION;
+    png_image_begin_read_from_file(&image_friend, "RAM.png");
+    
+    // png is big time done
 
     bool quit = false;         
     SDL_Event e;
