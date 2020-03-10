@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cassert>
 
+#include "vec.cpp"
 
 
 const int WINDOW_W = 800;
@@ -69,21 +70,25 @@ void draw_colored_rectangle(SDL_Renderer *renderer, SDL_Rect rect, uint32_t colo
     SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, r, g, b, a));
 }
 
+struct Entity {
+    int w;
+    int h;
+    vec2i pos;  
+};
+
 int main(int argc, char** argv) {
     printf("Initializing SDL...\n");
-  
-    const int PLAYER_W = 25;
-    assert((PLAYER_W * 2) < GAMEAREA_W);
-    
-    const int PLAYER_H = 100;
-    assert(PLAYER_H < GAMEAREA_H);
-
     const int PLAYER_OFFSET_X = 5;
-    const int PLAYER_X = GAMEAREA_X + PLAYER_OFFSET_X;
-    assert(PLAYER_X > GAMEAREA_X && PLAYER_X < (GAMEAREA_W + GAMEAREA_X));
 
-    const int PLAYER_Y = (GAMEAREA_H) / 2;
-    assert(PLAYER_Y > GAMEAREA_Y && PLAYER_Y < (GAMEAREA_H + GAMEAREA_Y));
+    Entity player = {};
+    player.w = 25;
+    player.h = 100;
+    player.pos = { GAMEAREA_X + PLAYER_OFFSET_X, GAMEAREA_H / 2 };
+
+    assert((player.w * 2) < GAMEAREA_W);
+    assert(player.h < GAMEAREA_H);    
+    assert(player.pos.x > GAMEAREA_X && player.pos.x < (GAMEAREA_W + GAMEAREA_X));
+    assert(player.pos.y > GAMEAREA_Y && player.pos.y < (GAMEAREA_H + GAMEAREA_Y));
 
     SDL_ErrorCheck(SDL_Init(SDL_INIT_VIDEO));
     SDL_Window *window = SDL_ErrorCheck(SDL_CreateWindow("cppong", 
@@ -96,7 +101,6 @@ int main(int argc, char** argv) {
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
 
     SDL_Rect world = {GAMEAREA_X, GAMEAREA_Y, GAMEAREA_W, GAMEAREA_H};
-    SDL_Rect player = {PLAYER_X, PLAYER_Y, PLAYER_W, PLAYER_H};
 
     // Font below
     TTF_ErrorCheck(TTF_Init());    
@@ -167,14 +171,16 @@ int main(int argc, char** argv) {
             dy = 1;
         }
 
-        if(player.y + dy >= GAMEAREA_Y && (player.y + dy + player.h) < GAMEAREA_Y + GAMEAREA_H)
-            player.y += dy;
+        if(player.pos.y + dy >= GAMEAREA_Y && (player.pos.y + dy + player.h) < GAMEAREA_Y + GAMEAREA_H)
+            player.pos.y += dy;
 
         SDL_ErrorCheck(SDL_RenderClear(renderer));
         SDL_ErrorCheck(SDL_RenderCopy(renderer, image_texture, nullptr, &world));
         SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x22, 0x22, 0x22, 0xFF));
-        draw_colored_rectangle(renderer, player, 0x0000FFFF);
-        SDL_ErrorCheck(SDL_RenderCopy(renderer, image_texture, nullptr, &player));
+        SDL_Rect play_rectm = {player.pos.x, player.pos.y, player.w, player.h };
+
+        draw_colored_rectangle(renderer, play_rectm, 0x0000FFFF);
+        SDL_ErrorCheck(SDL_RenderCopy(renderer, image_texture, nullptr, &play_rectm));
         draw_colored_rectangle(renderer, world, 0xFF0000FF);
         
         SDL_RenderCopy(renderer, font_texture, nullptr, &font_rect);
