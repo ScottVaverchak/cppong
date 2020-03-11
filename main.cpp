@@ -6,7 +6,7 @@
 #include <cassert>
 
 #include "vec.cpp"
-
+    
 
 const int WINDOW_W = 800;
 const int WINDOW_H = 400;
@@ -84,9 +84,6 @@ int main(int argc, char** argv) {
     player.w = 25;
     player.h = 100;
 
-    // vscode thinks this is wrong 
-    // I need to swith to emacs or something 
-    // stop being a coward, its vim.
     player.pos = { GAMEAREA_X + PLAYER_OFFSET_X, GAMEAREA_H / 2 };
 
     assert((player.w * 2) < GAMEAREA_W);

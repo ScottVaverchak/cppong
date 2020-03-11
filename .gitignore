@@ -2,3 +2,4 @@ main.o
 cppong
 cppong.dSYM/
 .DS_Store
+*.swp
