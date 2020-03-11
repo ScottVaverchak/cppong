@@ -77,6 +77,14 @@ struct Entity {
 };
 
 int main(int argc, char** argv) {
+    /*
+    vec2i a = {10, 20};
+    int b = 0;
+    vec2i c = a / b;
+
+    printf("%d %d\n", c.x, c.y);
+    return 0;
+*/
     printf("Initializing SDL...\n");
     const int PLAYER_OFFSET_X = 5;
 
