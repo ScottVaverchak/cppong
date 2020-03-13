@@ -73,18 +73,10 @@ void draw_colored_rectangle(SDL_Renderer *renderer, SDL_Rect rect, uint32_t colo
 struct Entity {
     int w;
     int h;
-    vec2i pos;  
+    Vec2i pos;  
 };
 
 int main(int argc, char** argv) {
-    /*
-    vec2i a = {10, 20};
-    int b = 0;
-    vec2i c = a / b;
-
-    printf("%d %d\n", c.x, c.y);
-    return 0;
-*/
     printf("Initializing SDL...\n");
     const int PLAYER_OFFSET_X = 5;
 
