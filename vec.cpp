@@ -1,3 +1,6 @@
+#ifndef VEC_CPP_
+#define VEC_CPP_
+
 template<typename T>
 struct Vec2 {
     T x;
@@ -17,6 +20,30 @@ Vec2<T> constexpr operator - (Vec2<T> lhs, Vec2<T> rhs) {
 }
 
 template<typename T>
+Vec2<T> &operator += (Vec2<T> &lhs, Vec2<T> rhs) {
+    lhs = lhs + rhs;
+    return lhs;
+}
+
+template<typename T>
+Vec2<T> &operator -= (Vec2<T> &lhs, Vec2<T> rhs) {
+    lhs = lhs - rhs;
+    return lhs;
+}
+
+template<typename T>
+Vec2<T> constexpr operator + (Vec2<T> lhs, T rhs) {
+    Vec2<T> result = { lhs.x + rhs, lhs.y + rhs };
+    return result;
+}
+
+template<typename T>
+Vec2<T> operator - (Vec2<T> lhs, T rhs) {
+    Vec2<T> result = { lhs.x - rhs, lhs.y - rhs };
+    return result;
+}
+
+template<typename T>
 Vec2<T> constexpr operator * (Vec2<T> lhs, T rhs) {
     Vec2<T> result = { lhs.x * rhs, lhs.y * rhs };
     return result;
@@ -31,18 +58,6 @@ Vec2<T> operator / (Vec2<T> lhs, T rhs) {
 }
 
 template<typename T>
-Vec2<T> &operator += (Vec2<T> &lhs, Vec2<T> rhs) {
-    lhs = lhs + rhs;
-    return lhs;
-}
-
-template<typename T>
-Vec2<T> &operator -= (Vec2<T> &lhs, Vec2<T> rhs) {
-    lhs = lhs - rhs;
-    return lhs;
-}
-
-template<typename T>
 Vec2<T> &operator *= (Vec2<T> &lhs, T rhs) {
     lhs = lhs * rhs;
     return lhs;
@@ -54,25 +69,24 @@ Vec2<T> &operator /= (Vec2<T> &lhs, T rhs) {
     return lhs;
 }
 
-/*
 template<typename T>
-vec2<T> operator - (vec2<T> lhs, vec2<T> rhs) {
-    vec2<T> result = { lhs.x - rhs.x, lhs.y - rhs.y };
-    return result;
+Vec2<T> &operator += (Vec2<T> &lhs, T rhs) {
+    lhs = lhs + rhs;
+    return lhs;
 }
 
 template<typename T>
-vec2<T> operator * (vec2<T> lhs, T rhs) {
-    vec2<T> result = { lhs.x * rhs, lhs.y * rhs };
-    return result;
+Vec2<T> &operator -= (Vec2<T> &lhs, T rhs) {
+    lhs = lhs - rhs;
+    return lhs;
 }
 
 template<typename T>
-vec2<T> operator / (vec2<T> lhs, T rhs) {
-    assert(rhs != 0);
-    
-    vec2<T> result = { lhs.x / rhs, lhs.y / rhs };
+Vec2<T> operator -(Vec2<T> vec) {
+    Vec2<T> result = { -vec.x, -vec.y };
     return result;
 }
-*/
+
 using Vec2i = Vec2<int>;
+
+#endif // VEC_CPP_
