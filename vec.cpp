@@ -20,13 +20,13 @@ Vec2<T> constexpr operator - (Vec2<T> lhs, Vec2<T> rhs) {
 }
 
 template<typename T>
-Vec2<T> &operator += (Vec2<T> &lhs, Vec2<T> rhs) {
+Vec2<T> constexpr &operator += (Vec2<T> &lhs, Vec2<T> rhs) {
     lhs = lhs + rhs;
     return lhs;
 }
 
 template<typename T>
-Vec2<T> &operator -= (Vec2<T> &lhs, Vec2<T> rhs) {
+Vec2<T> constexpr &operator -= (Vec2<T> &lhs, Vec2<T> rhs) {
     lhs = lhs - rhs;
     return lhs;
 }
@@ -47,13 +47,13 @@ Vec2<T> constexpr operator / (Vec2<T> lhs, Vec2<T> rhs) {
 }
 
 template<typename T>
-Vec2<T> &operator *= (Vec2<T> &lhs, Vec2<T> rhs) {
+Vec2<T> constexpr &operator *= (Vec2<T> &lhs, Vec2<T> rhs) {
     lhs = lhs * rhs;
     return lhs;
 }
 
 template<typename T>
-Vec2<T> &operator /= (Vec2<T> &lhs, Vec2<T> rhs) {
+Vec2<T> constexpr &operator /= (Vec2<T> &lhs, Vec2<T> rhs) {
     lhs = lhs / rhs;
     return lhs;
 }
@@ -65,7 +65,7 @@ Vec2<T> constexpr operator + (Vec2<T> lhs, T rhs) {
 }
 
 template<typename T>
-Vec2<T> operator - (Vec2<T> lhs, T rhs) {
+Vec2<T> constexpr operator - (Vec2<T> lhs, T rhs) {
     Vec2<T> result = { lhs.x - rhs, lhs.y - rhs };
     return result;
 }
@@ -77,7 +77,7 @@ Vec2<T> constexpr operator * (Vec2<T> lhs, T rhs) {
 }
 
 template<typename T>
-Vec2<T> operator / (Vec2<T> lhs, T rhs) {
+Vec2<T> constexpr operator / (Vec2<T> lhs, T rhs) {
     assert(rhs != 0);
     
     Vec2<T> result = { lhs.x / rhs, lhs.y / rhs };
@@ -85,31 +85,31 @@ Vec2<T> operator / (Vec2<T> lhs, T rhs) {
 }
 
 template<typename T>
-Vec2<T> &operator *= (Vec2<T> &lhs, T rhs) {
+Vec2<T> constexpr &operator *= (Vec2<T> &lhs, T rhs) {
     lhs = lhs * rhs;
     return lhs;
 }
 
 template<typename T>
-Vec2<T> &operator /= (Vec2<T> &lhs, T rhs) {
+Vec2<T> constexpr &operator /= (Vec2<T> &lhs, T rhs) {
     lhs = lhs / rhs;
     return lhs;
 }
 
 template<typename T>
-Vec2<T> &operator += (Vec2<T> &lhs, T rhs) {
+Vec2<T> constexpr &operator += (Vec2<T> &lhs, T rhs) {
     lhs = lhs + rhs;
     return lhs;
 }
 
 template<typename T>
-Vec2<T> &operator -= (Vec2<T> &lhs, T rhs) {
+Vec2<T> constexpr &operator -= (Vec2<T> &lhs, T rhs) {
     lhs = lhs - rhs;
     return lhs;
 }
 
 template<typename T>
-Vec2<T> operator -(Vec2<T> vec) {
+Vec2<T> constexpr operator -(Vec2<T> vec) {
     Vec2<T> result = { -vec.x, -vec.y };
     return result;
 }
