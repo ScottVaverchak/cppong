@@ -71,9 +71,8 @@ void draw_colored_rectangle(SDL_Renderer *renderer, SDL_Rect rect, uint32_t colo
 }
 
 struct Entity {
-    int w;
-    int h;
-    Vec2i pos;  
+    Vec2i pos;
+    SDL_Rect hitbox;
 };
 
 int main(int argc, char** argv) {
@@ -81,13 +80,11 @@ int main(int argc, char** argv) {
     const int PLAYER_OFFSET_X = 5;
 
     Entity player = {};
-    player.w = 25;
-    player.h = 100;
-
     player.pos = { GAMEAREA_X + PLAYER_OFFSET_X, GAMEAREA_H / 2 };
-
-    assert((player.w * 2) < GAMEAREA_W);
-    assert(player.h < GAMEAREA_H);    
+    player.hitbox = {player.pos.x, player.pos.y, 25, 100};
+    
+    assert((player.hitbox.w * 2) < GAMEAREA_W);
+    assert(player.hitbox.h < GAMEAREA_H);    
     assert(player.pos.x > GAMEAREA_X && player.pos.x < (GAMEAREA_W + GAMEAREA_X));
     assert(player.pos.y > GAMEAREA_Y && player.pos.y < (GAMEAREA_H + GAMEAREA_Y));
 
@@ -172,13 +169,13 @@ int main(int argc, char** argv) {
             dy = 1;
         }
 
-        if(player.pos.y + dy >= GAMEAREA_Y && (player.pos.y + dy + player.h) < GAMEAREA_Y + GAMEAREA_H)
+        if(player.pos.y + dy >= GAMEAREA_Y && (player.pos.y + dy + player.hitbox.h) < GAMEAREA_Y + GAMEAREA_H)
             player.pos.y += dy;
 
         SDL_ErrorCheck(SDL_RenderClear(renderer));
         SDL_ErrorCheck(SDL_RenderCopy(renderer, image_texture, nullptr, &world));
         SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x22, 0x22, 0x22, 0xFF));
-        SDL_Rect play_rectm = {player.pos.x, player.pos.y, player.w, player.h };
+        SDL_Rect play_rectm = {player.pos.x, player.pos.y, player.hitbox.w, player.hitbox.h };
 
         draw_colored_rectangle(renderer, play_rectm, 0x0000FFFF);
         SDL_ErrorCheck(SDL_RenderCopy(renderer, image_texture, nullptr, &play_rectm));
