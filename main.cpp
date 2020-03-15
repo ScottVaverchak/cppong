@@ -176,8 +176,9 @@ int main(int argc, char** argv) {
         SDL_ErrorCheck(SDL_RenderCopy(renderer, image_texture, nullptr, &world));
         SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x22, 0x22, 0x22, 0xFF));
         SDL_Rect play_rectm = {player.pos.x, player.pos.y, player.hitbox.w, player.hitbox.h };
-
+        SDL_Rect play_pos = {player.pos.x, player.pos.y, 2, 2 };
         draw_colored_rectangle(renderer, play_rectm, 0x0000FFFF);
+        draw_colored_rectangle(renderer, play_pos, 0xFF00FFFF);
         SDL_ErrorCheck(SDL_RenderCopy(renderer, image_texture, nullptr, &play_rectm));
         draw_colored_rectangle(renderer, world, 0xFF0000FF);
         
