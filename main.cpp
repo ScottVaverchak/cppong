@@ -73,6 +73,7 @@ void draw_colored_rectangle(SDL_Renderer *renderer, SDL_Rect rect, uint32_t colo
 struct Entity {
     Vec2i pos;
     SDL_Rect hitbox;
+    SDL_Texture *texture;
 };
 
 int main(int argc, char** argv) {
@@ -144,7 +145,7 @@ int main(int argc, char** argv) {
         0xFF000000
     ));
 
-    SDL_Texture *image_texture = SDL_ErrorCheck(SDL_CreateTextureFromSurface(renderer, image_surface));
+    player.texture = SDL_ErrorCheck(SDL_CreateTextureFromSurface(renderer, image_surface));
     // png is big time done
 
     bool quit = false;         
@@ -173,13 +174,12 @@ int main(int argc, char** argv) {
             player.pos.y += dy;
 
         SDL_ErrorCheck(SDL_RenderClear(renderer));
-        SDL_ErrorCheck(SDL_RenderCopy(renderer, image_texture, nullptr, &world));
         SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x22, 0x22, 0x22, 0xFF));
         SDL_Rect play_rectm = {player.pos.x, player.pos.y, player.hitbox.w, player.hitbox.h };
         SDL_Rect play_pos = {player.pos.x, player.pos.y, 2, 2 };
         draw_colored_rectangle(renderer, play_rectm, 0x0000FFFF);
         draw_colored_rectangle(renderer, play_pos, 0xFF00FFFF);
-        SDL_ErrorCheck(SDL_RenderCopy(renderer, image_texture, nullptr, &play_rectm));
+        SDL_ErrorCheck(SDL_RenderCopy(renderer, player.texture, nullptr, &play_rectm));
         draw_colored_rectangle(renderer, world, 0xFF0000FF);
         
         SDL_RenderCopy(renderer, font_texture, nullptr, &font_rect);
