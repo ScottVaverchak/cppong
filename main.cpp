@@ -6,7 +6,6 @@
 #include <cassert>
 
 #include "vec.cpp"
-    
 
 const int WINDOW_W = 800;
 const int WINDOW_H = 400;
@@ -73,7 +72,7 @@ void draw_colored_rectangle(SDL_Renderer *renderer, SDL_Rect rect, uint32_t colo
 struct Entity {
     Vec2i pos;
     SDL_Rect hitbox;
-    SDL_Texture *texture;
+    SDL_Rect srcrect;
 };
 
 int main(int argc, char** argv) {
@@ -82,8 +81,9 @@ int main(int argc, char** argv) {
 
     Entity player = {};
     player.pos = { GAMEAREA_X + PLAYER_OFFSET_X, GAMEAREA_H / 2 };
-    player.hitbox = {player.pos.x, player.pos.y, 25, 100};
-    
+    player.hitbox = {player.pos.x, player.pos.y, 12 * 2, 30 * 2 };
+    player.srcrect = { 8, 1, 12, 30 }; 
+
     assert((player.hitbox.w * 2) < GAMEAREA_W);
     assert(player.hitbox.h < GAMEAREA_H);    
     assert(player.pos.x > GAMEAREA_X && player.pos.x < (GAMEAREA_W + GAMEAREA_X));
@@ -145,10 +145,12 @@ int main(int argc, char** argv) {
         0xFF000000
     ));
 
-    player.texture = SDL_ErrorCheck(SDL_CreateTextureFromSurface(renderer, image_surface));
+    SDL_Texture *paddle_texture = SDL_ErrorCheck(SDL_CreateTextureFromSurface(renderer, image_surface));
     // png is big time done
 
-    bool quit = false;         
+    bool quit = false;
+    bool display_debug = false;
+
     SDL_Event e;
 
     Uint32 prev_dt = 1;
@@ -159,7 +161,16 @@ int main(int argc, char** argv) {
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
                 quit = true;
+            } 
+
+            if (e.type == SDL_KEYUP) {
+                switch(e.key.keysym.sym) {
+                    case SDLK_d: {
+                        display_debug = !display_debug;
+                    } break;
+                }
             }
+
         }
 
         const uint8_t *keyboard_state = SDL_GetKeyboardState(NULL);
@@ -176,13 +187,18 @@ int main(int argc, char** argv) {
         SDL_ErrorCheck(SDL_RenderClear(renderer));
         SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x22, 0x22, 0x22, 0xFF));
         SDL_Rect play_rectm = {player.pos.x, player.pos.y, player.hitbox.w, player.hitbox.h };
-        SDL_Rect play_pos = {player.pos.x, player.pos.y, 2, 2 };
-        draw_colored_rectangle(renderer, play_rectm, 0x0000FFFF);
-        draw_colored_rectangle(renderer, play_pos, 0xFF00FFFF);
-        SDL_ErrorCheck(SDL_RenderCopy(renderer, player.texture, nullptr, &play_rectm));
-        draw_colored_rectangle(renderer, world, 0xFF0000FF);
+        SDL_ErrorCheck(SDL_RenderCopy(renderer, paddle_texture, &player.srcrect, &play_rectm));
         
         SDL_RenderCopy(renderer, font_texture, nullptr, &font_rect);
+
+        if(display_debug) {
+            SDL_Rect play_pos = {player.pos.x, player.pos.y, 2, 2 };
+            draw_colored_rectangle(renderer, play_rectm, 0x0000FFFF);
+            draw_colored_rectangle(renderer, play_pos, 0xFF00FFFF);
+            draw_colored_rectangle(renderer, world, 0xFF0000FF);
+            
+        }
+
         SDL_RenderPresent(renderer);
         
         const Uint32 dt = SDL_GetTicks() - begin;
