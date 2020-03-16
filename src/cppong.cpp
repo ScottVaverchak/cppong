@@ -14,6 +14,13 @@ const int GAMEAREA_H = WINDOW_H * 0.75f;
 const int GAMEAREA_X = (WINDOW_W - GAMEAREA_W) / 2;
 const int GAMEAREA_Y = (WINDOW_H - GAMEAREA_H) / 2;
 
+const int BALL_SPAWN_X = GAMEAREA_X + (GAMEAREA_W / 2);
+const int BALL_SPAWN_Y = GAMEAREA_Y + (GAMEAREA_H / 2);
+
+const int BALL_RADIUS = 10;
+
+const float PI = 3.141592f;
+
 int SDL_ErrorCheck(int code) {
     if(code != 0) {
         printf("SDL error: %s\n", SDL_GetError());
@@ -54,7 +61,6 @@ T *TTF_ErrorCheck(T *ptr) {
 
 void draw_colored_rectangle(SDL_Renderer *renderer, SDL_Rect rect, uint32_t color) {
 
-    // R G B A
     Uint8 r, g, b, a;
     SDL_ErrorCheck(SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a));
     
@@ -68,11 +74,40 @@ void draw_colored_rectangle(SDL_Renderer *renderer, SDL_Rect rect, uint32_t colo
     SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, r, g, b, a));
 }
 
+void draw_colored_circle(SDL_Renderer *renderer, Vec2i position, int radius, uint32_t color) {
+    Uint8 r, g, b, a;
+    SDL_ErrorCheck(SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a));
+    SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 
+            (color & 0xFF000000) >> 24, 
+            (color & 0x00FF0000) >> 16, 
+            (color & 0x0000FF00) >> 8, 
+            (color & 0x000000FF)));
+
+    const int segments = 8;
+    assert(segments >= 3);
+
+    const float f = (2.0f * PI) / segments;
+
+    for(size_t i = 1; i <= segments; i++) {
+        const auto x = (sinf(i * f) * radius) + position.x;
+        const auto y = (cosf(i * f) * radius) + position.y;
+
+        const auto nx = (sinf((i + 1) * f) * radius) + position.x;
+        const auto ny = (cosf((i + 1) * f) * radius) + position.y;
+
+        SDL_ErrorCheck(SDL_RenderDrawLine(renderer, x, y, nx, ny));
+    }
+
+    SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, r, g, b, a));
+}
+
 struct Entity {
     Vec2i pos;
     SDL_Rect hitbox;
     SDL_Rect srcrect;
 };
+
+Vec2i ball_pos = { BALL_SPAWN_X, BALL_SPAWN_Y };
 
 SDL_Texture *load_texture_from_file(SDL_Renderer *renderer, const char* filename) {
 
@@ -116,6 +151,10 @@ int cppong_main() {
     oppo.pos = { (GAMEAREA_X + GAMEAREA_W) - PLAYER_OFFSET_X - 12 * 2, GAMEAREA_H / 2 };
     oppo.hitbox = {oppo.pos.x, oppo.pos.y, 12 * 2, 30 * 2 };
     oppo.srcrect = { 8, 1, 12, 30 }; 
+
+    Entity ball = {};
+    ball.pos = { BALL_SPAWN_X, BALL_SPAWN_Y};
+    
 
     assert((player.hitbox.w * 2) < GAMEAREA_W);
     assert(player.hitbox.h < GAMEAREA_H);    
@@ -212,6 +251,7 @@ int cppong_main() {
             draw_colored_rectangle(renderer, oppo_rectm, 0xFFFFFFFF);
             draw_colored_rectangle(renderer, oppo_pos, 0x0000FFFF);
             draw_colored_rectangle(renderer, world, 0xFF0000FF);
+            draw_colored_circle(renderer, ball.pos, BALL_RADIUS, 0xFF00FFFF);
         }
 
         SDL_RenderPresent(renderer);
