@@ -112,7 +112,7 @@ int cppong_main() {
 
     // Font below
     TTF_ErrorCheck(TTF_Init());    
-    TTF_Font *main_font = TTF_ErrorCheck(TTF_OpenFont("uni0553-webfont.ttf", 32));
+    TTF_Font *main_font = TTF_ErrorCheck(TTF_OpenFont("assets/uni0553-webfont.ttf", 32));
     SDL_Surface *font_surface = TTF_ErrorCheck(TTF_RenderText_Blended(main_font, "cppong++", {255, 0, 255}));
     SDL_Texture *font_texture = SDL_ErrorCheck(SDL_CreateTextureFromSurface(renderer, font_surface));
     
@@ -123,9 +123,12 @@ int cppong_main() {
     SDL_Rect font_rect = { (WINDOW_W / 2) - (font_width / 2), 0, font_width, font_height};
 
     int image_width, image_height, image_channels;
+    unsigned char *image = stbi_load("assets/RAM.png", &image_width, &image_height, &image_channels, STBI_rgb_alpha);
 
-    // @TODO(sjv): What error could stb return?
-    unsigned char *image = stbi_load("RAM.png", &image_width, &image_height, &image_channels, STBI_rgb_alpha);
+    if(image == nullptr) {
+        printf("Error loading: RAM.png");
+        abort();
+    }
 
     SDL_Surface *image_surface = SDL_ErrorCheck(SDL_CreateRGBSurfaceFrom(
         image, 
@@ -196,14 +199,12 @@ int cppong_main() {
         if(display_debug) {
             SDL_Rect play_pos = {player.pos.x, player.pos.y, 2, 2 };
             SDL_Rect oppo_pos = {oppo.pos.x, oppo.pos.y, 2, 2  };
+
             draw_colored_rectangle(renderer, play_rectm, 0x0000FFFF);
             draw_colored_rectangle(renderer, play_pos, 0xFF00FFFF);
-
             draw_colored_rectangle(renderer, oppo_rectm, 0xFFFFFFFF);
             draw_colored_rectangle(renderer, oppo_pos, 0x0000FFFF);
-
             draw_colored_rectangle(renderer, world, 0xFF0000FF);
-            
         }
 
         SDL_RenderPresent(renderer);
