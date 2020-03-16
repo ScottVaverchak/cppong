@@ -84,10 +84,20 @@ int main(int argc, char** argv) {
     player.hitbox = {player.pos.x, player.pos.y, 12 * 2, 30 * 2 };
     player.srcrect = { 8, 1, 12, 30 }; 
 
+    Entity oppo = {};
+    oppo.pos = { (GAMEAREA_X + GAMEAREA_W) - PLAYER_OFFSET_X - 12 * 2, GAMEAREA_H / 2 };
+    oppo.hitbox = {oppo.pos.x, oppo.pos.y, 12 * 2, 30 * 2 };
+    oppo.srcrect = { 8, 1, 12, 30 }; 
+
     assert((player.hitbox.w * 2) < GAMEAREA_W);
     assert(player.hitbox.h < GAMEAREA_H);    
     assert(player.pos.x > GAMEAREA_X && player.pos.x < (GAMEAREA_W + GAMEAREA_X));
     assert(player.pos.y > GAMEAREA_Y && player.pos.y < (GAMEAREA_H + GAMEAREA_Y));
+
+    assert((oppo.hitbox.w * 2) < GAMEAREA_W);
+    assert(oppo.hitbox.h < GAMEAREA_H);    
+    assert(oppo.pos.x > GAMEAREA_X && oppo.pos.x < (GAMEAREA_W + GAMEAREA_X));
+    assert(oppo.pos.y > GAMEAREA_Y && oppo.pos.y < (GAMEAREA_H + GAMEAREA_Y));
 
     SDL_ErrorCheck(SDL_Init(SDL_INIT_VIDEO));
     SDL_Window *window = SDL_ErrorCheck(SDL_CreateWindow("cppong", 
@@ -186,15 +196,27 @@ int main(int argc, char** argv) {
 
         SDL_ErrorCheck(SDL_RenderClear(renderer));
         SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x22, 0x22, 0x22, 0xFF));
+
         SDL_Rect play_rectm = {player.pos.x, player.pos.y, player.hitbox.w, player.hitbox.h };
+        SDL_Rect oppo_rectm = {oppo.pos.x, oppo.pos.y, oppo.hitbox.w, oppo.hitbox.h };
+
         SDL_ErrorCheck(SDL_RenderCopy(renderer, paddle_texture, &player.srcrect, &play_rectm));
+        
+        SDL_ErrorCheck(SDL_RenderCopyEx(renderer, paddle_texture, 
+                                        &oppo.srcrect, &oppo_rectm, 0, 
+                                        nullptr, SDL_FLIP_HORIZONTAL));
         
         SDL_RenderCopy(renderer, font_texture, nullptr, &font_rect);
 
         if(display_debug) {
             SDL_Rect play_pos = {player.pos.x, player.pos.y, 2, 2 };
+            SDL_Rect oppo_pos = {oppo.pos.x, oppo.pos.y, 2, 2  };
             draw_colored_rectangle(renderer, play_rectm, 0x0000FFFF);
             draw_colored_rectangle(renderer, play_pos, 0xFF00FFFF);
+
+            draw_colored_rectangle(renderer, oppo_rectm, 0xFFFFFFFF);
+            draw_colored_rectangle(renderer, oppo_pos, 0x0000FFFF);
+
             draw_colored_rectangle(renderer, world, 0xFF0000FF);
             
         }
@@ -207,9 +229,12 @@ int main(int argc, char** argv) {
     }
 
     printf("Exiting gracefully... :)\n");
+    
     SDL_DestroyWindow(window);
     TTF_CloseFont(main_font);
+
     TTF_Quit();
     SDL_Quit();
+    
     return 0;
 }
