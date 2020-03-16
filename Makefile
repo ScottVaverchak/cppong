@@ -6,9 +6,7 @@ OUTPUT=build build/assets
 ASSETS=assets
 
 cppong: main.cpp
-	$(shell rm -rf $(OUTPUT))
-	$(shell mkdir -p $(OUTPUT))
-	$(shell cp -r $(ASSETS) $(OUTPUT)/$(ASSETS))
+	rm -rf $(OUTPUT)
+	mkdir -p $(OUTPUT)
+	cp -r $(ASSETS) $(OUTPUT)/$(ASSETS)
 	$(CXX) $(CXXFLAGS) -o $(OUTPUT)/cppong src/macos_cppong.cpp $(LIBS)
-
-
