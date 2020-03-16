@@ -1,10 +1,9 @@
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
-#include <png.h>
 #include <cstdio>
 #include <cstdint>
 #include <cassert>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 #include "vec.cpp"
 
 const int WINDOW_W = 800;
@@ -75,7 +74,7 @@ struct Entity {
     SDL_Rect srcrect;
 };
 
-int main(int argc, char** argv) {
+int cppong_main() {
     printf("Initializing SDL...\n");
     const int PLAYER_OFFSET_X = 5;
 
@@ -122,41 +121,27 @@ int main(int argc, char** argv) {
     int font_width, font_height;
     SDL_ErrorCheck(SDL_QueryTexture(font_texture, nullptr, nullptr, &font_width, &font_height));
     SDL_Rect font_rect = { (WINDOW_W / 2) - (font_width / 2), 0, font_width, font_height};
-    // Font fin.h
 
-    // png fun begins here friend
-    png_image image_friend;
-    memset(&image_friend, 0, sizeof(png_image));
+    int image_width, image_height, image_channels;
 
-    image_friend.version = PNG_IMAGE_VERSION;
-    if(!png_image_begin_read_from_file(&image_friend, "RAM.png")) {
-        fprintf(stderr, "libpng errored reading RAM.png: %s", image_friend.message);
-        abort();
-    }
-
-    image_friend.format = PNG_FORMAT_RGBA;
-
-    uint32_t *pixel_friends = new uint32_t[image_friend.width * image_friend.height];
-    
-    if (!png_image_finish_read(&image_friend, nullptr, pixel_friends, 0, nullptr)) {
-        fprintf(stderr, "libpng errored: %s", image_friend.message);
-        abort();
-    }
+    // @TODO(sjv): What error could stb return?
+    unsigned char *image = stbi_load("RAM.png", &image_width, &image_height, &image_channels, STBI_rgb_alpha);
 
     SDL_Surface *image_surface = SDL_ErrorCheck(SDL_CreateRGBSurfaceFrom(
-        pixel_friends, 
-        image_friend.width, 
-        image_friend.height, 
+        image, 
+        image_width, 
+        image_height, 
         32,
-        image_friend.width * 4,
+        image_width * 4,
         0x000000FF,
         0x0000FF00,
         0x00FF0000,
         0xFF000000
     ));
 
+    stbi_image_free(image);
+
     SDL_Texture *paddle_texture = SDL_ErrorCheck(SDL_CreateTextureFromSurface(renderer, image_surface));
-    // png is big time done
 
     bool quit = false;
     bool display_debug = false;

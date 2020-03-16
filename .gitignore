@@ -3,3 +3,4 @@ cppong
 cppong.dSYM/
 .DS_Store
 *.swp
+build/
