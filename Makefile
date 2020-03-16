@@ -6,6 +6,6 @@ OUTPUT=build
 
 cppong: main.cpp
 	$(shell mkdir -p $(OUTPUT))
-	$(CXX) $(CXXFLAGS) -o $(OUTPUT)/cppong macos_cppong.cpp $(LIBS)
+	$(CXX) $(CXXFLAGS) -o $(OUTPUT)/cppong src/macos_cppong.cpp $(LIBS)
 
 
