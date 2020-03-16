@@ -74,6 +74,35 @@ struct Entity {
     SDL_Rect srcrect;
 };
 
+SDL_Texture *load_texture_from_file(SDL_Renderer *renderer, const char* filename) {
+
+    int image_width, image_height, image_channels;
+    unsigned char *image = stbi_load(filename, &image_width, &image_height, &image_channels, STBI_rgb_alpha);
+
+    if(image == nullptr) {
+        printf("Error loading: %s", filename);
+        abort();
+    }
+
+    SDL_Surface *image_surface = SDL_ErrorCheck(SDL_CreateRGBSurfaceFrom(
+        image, 
+        image_width, 
+        image_height, 
+        32,
+        image_width * 4,
+        0x000000FF,
+        0x0000FF00,
+        0x00FF0000,
+        0xFF000000
+    ));
+
+    stbi_image_free(image);
+
+    SDL_Texture *texture = SDL_ErrorCheck(SDL_CreateTextureFromSurface(renderer, image_surface));
+
+    return texture;
+}
+
 int cppong_main() {
     printf("Initializing SDL...\n");
     const int PLAYER_OFFSET_X = 5;
@@ -122,29 +151,7 @@ int cppong_main() {
     SDL_ErrorCheck(SDL_QueryTexture(font_texture, nullptr, nullptr, &font_width, &font_height));
     SDL_Rect font_rect = { (WINDOW_W / 2) - (font_width / 2), 0, font_width, font_height};
 
-    int image_width, image_height, image_channels;
-    unsigned char *image = stbi_load("assets/RAM.png", &image_width, &image_height, &image_channels, STBI_rgb_alpha);
-
-    if(image == nullptr) {
-        printf("Error loading: RAM.png");
-        abort();
-    }
-
-    SDL_Surface *image_surface = SDL_ErrorCheck(SDL_CreateRGBSurfaceFrom(
-        image, 
-        image_width, 
-        image_height, 
-        32,
-        image_width * 4,
-        0x000000FF,
-        0x0000FF00,
-        0x00FF0000,
-        0xFF000000
-    ));
-
-    stbi_image_free(image);
-
-    SDL_Texture *paddle_texture = SDL_ErrorCheck(SDL_CreateTextureFromSurface(renderer, image_surface));
+    SDL_Texture *paddle_texture = load_texture_from_file(renderer, "assets/RAM.png");
 
     bool quit = false;
     bool display_debug = false;
