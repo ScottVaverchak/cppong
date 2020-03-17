@@ -116,4 +116,15 @@ Vec2<T> constexpr operator -(Vec2<T> vec) {
 
 using Vec2i = Vec2<int>;
 
+template<typename T>
+T max(T a, T b) {
+    return a > b ? a : b;
+}
+
+template<typename T>
+T min(T a, T b) {
+    return a > b ? b : a;
+}
+
+
 #endif // VEC_CPP_

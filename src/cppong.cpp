@@ -22,7 +22,7 @@ const int BALL_RADIUS = 10;
 const float PI = 3.141592f;
 
 int SDL_ErrorCheck(int code) {
-    if(code != 0) {
+    if(code < 0) {
         printf("SDL error: %s\n", SDL_GetError());
         abort();
     }
@@ -86,14 +86,14 @@ void draw_colored_circle(SDL_Renderer *renderer, Vec2i position, int radius, uin
     const int segments = 8;
     assert(segments >= 3);
 
-    const float f = (2.0f * PI) / segments;
+    const float segment_radians = (2.0f * PI) / segments;
 
     for(size_t i = 1; i <= segments; i++) {
-        const auto x = (sinf(i * f) * radius) + position.x;
-        const auto y = (cosf(i * f) * radius) + position.y;
+        const auto x = (sinf(i * segment_radians) * radius) + position.x;
+        const auto y = (cosf(i * segment_radians) * radius) + position.y;
 
-        const auto nx = (sinf((i + 1) * f) * radius) + position.x;
-        const auto ny = (cosf((i + 1) * f) * radius) + position.y;
+        const auto nx = (sinf((i + 1) * segment_radians) * radius) + position.x;
+        const auto ny = (cosf((i + 1) * segment_radians) * radius) + position.y;
 
         SDL_ErrorCheck(SDL_RenderDrawLine(renderer, x, y, nx, ny));
     }
@@ -103,6 +103,8 @@ void draw_colored_circle(SDL_Renderer *renderer, Vec2i position, int radius, uin
 
 struct Entity {
     Vec2i pos;
+    Vec2i vel;
+
     SDL_Rect hitbox;
     SDL_Rect srcrect;
 };
@@ -131,11 +133,24 @@ SDL_Texture *load_texture_from_file(SDL_Renderer *renderer, const char* filename
         0xFF000000
     ));
 
-    stbi_image_free(image);
-
     SDL_Texture *texture = SDL_ErrorCheck(SDL_CreateTextureFromSurface(renderer, image_surface));
-
+    
+    stbi_image_free(image);
+    
     return texture;
+}
+
+enum Rect_Side {
+    TOP,
+    RIGHT,
+    BOTTOM,
+    LEFT
+};
+
+bool paddle_ball_collision(const SDL_Rect rect, const int radius, const Vec2i ball_position) {
+    auto dx = ball_position.x - max(rect.x, min(ball_position.x, rect.x + rect.w));
+    auto dy = ball_position.y - max(rect.y, min(ball_position.y, rect.y + rect.h));
+    return (dx * dx + dy * dy) < (radius * radius);
 }
 
 int cppong_main() {
@@ -154,7 +169,8 @@ int cppong_main() {
 
     Entity ball = {};
     ball.pos = { BALL_SPAWN_X, BALL_SPAWN_Y};
-    
+    ball.srcrect = {0, 0, 16, 16};
+    ball.vel = { 1, 2 };
 
     assert((player.hitbox.w * 2) < GAMEAREA_W);
     assert(player.hitbox.h < GAMEAREA_H);    
@@ -191,6 +207,7 @@ int cppong_main() {
     SDL_Rect font_rect = { (WINDOW_W / 2) - (font_width / 2), 0, font_width, font_height};
 
     SDL_Texture *paddle_texture = load_texture_from_file(renderer, "assets/RAM.png");
+    SDL_Texture *spritesheet_texture = load_texture_from_file(renderer, "assets/spritesheet.png");
 
     bool quit = false;
     bool display_debug = false;
@@ -226,20 +243,37 @@ int cppong_main() {
         }
 
         if(player.pos.y + dy >= GAMEAREA_Y && (player.pos.y + dy + player.hitbox.h) < GAMEAREA_Y + GAMEAREA_H)
-            player.pos.y += dy;
+        {
+            player.pos.y += dy * 2;
+            oppo.pos.y += dy * 2;
+        }
 
-        SDL_ErrorCheck(SDL_RenderClear(renderer));
-        SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x22, 0x22, 0x22, 0xFF));
+        ball.pos += ball.vel;
+
+        if(ball.pos.x > GAMEAREA_X + GAMEAREA_W || ball.pos.x < GAMEAREA_X)
+            ball.vel *= {-1, 1};
+        if(ball.pos.y > GAMEAREA_Y + GAMEAREA_H || ball.pos.y < GAMEAREA_Y)
+            ball.vel *= {1, -1};
 
         SDL_Rect play_rectm = {player.pos.x, player.pos.y, player.hitbox.w, player.hitbox.h };
         SDL_Rect oppo_rectm = {oppo.pos.x, oppo.pos.y, oppo.hitbox.w, oppo.hitbox.h };
+        SDL_Rect ball_rectm = {ball.pos.x - BALL_RADIUS, ball.pos.y - BALL_RADIUS, BALL_RADIUS * 2, BALL_RADIUS * 2 };
+                             
+        if(paddle_ball_collision(play_rectm, BALL_RADIUS, ball.pos))
+            ball.vel *= {-1, 1};
 
+        if(paddle_ball_collision(oppo_rectm, BALL_RADIUS, ball.pos))
+            ball.vel *= {-1, 1};
+
+        SDL_ErrorCheck(SDL_RenderClear(renderer));
+        SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x22, 0x22, 0x22, 0xFF));
         SDL_ErrorCheck(SDL_RenderCopy(renderer, paddle_texture, &player.srcrect, &play_rectm));
-        
         SDL_ErrorCheck(SDL_RenderCopyEx(renderer, paddle_texture, 
                                         &oppo.srcrect, &oppo_rectm, 0, 
                                         nullptr, SDL_FLIP_HORIZONTAL));
         
+        SDL_ErrorCheck(SDL_RenderCopy(renderer, spritesheet_texture, &ball.srcrect, &ball_rectm));
+
         SDL_RenderCopy(renderer, font_texture, nullptr, &font_rect);
 
         if(display_debug) {
