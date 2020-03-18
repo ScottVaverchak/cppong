@@ -70,6 +70,7 @@ int cppong_main() {
     ball.srcrect = {0, 0, 16, 16};
     ball.vel = { 1, 2 };
 
+    // TODO: are these asserts needed?
     assert((player.hitbox.w * 2) < GAMEAREA.w);
     assert(player.hitbox.h < GAMEAREA.h);    
     assert(player.pos.x > GAMEAREA.x && player.pos.x < (GAMEAREA.w + GAMEAREA.x));
@@ -90,6 +91,7 @@ int cppong_main() {
     SDL_Renderer *renderer = SDL_ErrorCheck(SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED));
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
 
+    // TODO: fonts are too hard to work with
     TTF_ErrorCheck(TTF_Init());    
     TTF_Font *main_font = TTF_ErrorCheck(TTF_OpenFont("assets/uni0553-webfont.ttf", 32));
     SDL_Surface *font_surface = TTF_ErrorCheck(TTF_RenderText_Blended(main_font, "cppong++", {255, 0, 255}));
