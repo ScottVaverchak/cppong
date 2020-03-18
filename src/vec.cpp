@@ -9,14 +9,12 @@ struct Vec2 {
 
 template<typename T>
 Vec2<T> constexpr operator + (Vec2<T> lhs, Vec2<T> rhs) {
-    Vec2<T> result = { lhs.x + rhs.x, lhs.y + rhs.y };
-    return result;
+    return { lhs.x + rhs.x, lhs.y + rhs.y };
 }
 
 template<typename T>
 Vec2<T> constexpr operator - (Vec2<T> lhs, Vec2<T> rhs) {
-    Vec2<T> result = { lhs.x - rhs.x, lhs.y - rhs.y };
-    return result;
+    return { lhs.x - rhs.x, lhs.y - rhs.y };
 }
 
 template<typename T>
@@ -33,8 +31,7 @@ Vec2<T> constexpr &operator -= (Vec2<T> &lhs, Vec2<T> rhs) {
 
 template<typename T>
 Vec2<T> constexpr operator * (Vec2<T> lhs, Vec2<T> rhs) {
-    Vec2<T> result = { lhs.x * rhs.x, lhs.y * rhs.y };
-    return result;
+    return { lhs.x * rhs.x, lhs.y * rhs.y };
 }
 
 template<typename T>
@@ -42,8 +39,7 @@ Vec2<T> constexpr operator / (Vec2<T> lhs, Vec2<T> rhs) {
     assert(rhs.x != 0);
     assert(rhs.y != 0);
 
-    Vec2<T> result = { lhs.x / rhs.x, lhs.y / rhs.y };
-    return result;
+    return  { lhs.x / rhs.x, lhs.y / rhs.y };
 }
 
 template<typename T>
@@ -60,28 +56,24 @@ Vec2<T> constexpr &operator /= (Vec2<T> &lhs, Vec2<T> rhs) {
 
 template<typename T>
 Vec2<T> constexpr operator + (Vec2<T> lhs, T rhs) {
-    Vec2<T> result = { lhs.x + rhs, lhs.y + rhs };
-    return result;
+    return { lhs.x + rhs, lhs.y + rhs };
 }
 
 template<typename T>
 Vec2<T> constexpr operator - (Vec2<T> lhs, T rhs) {
-    Vec2<T> result = { lhs.x - rhs, lhs.y - rhs };
-    return result;
+    return { lhs.x - rhs, lhs.y - rhs };
 }
 
 template<typename T>
 Vec2<T> constexpr operator * (Vec2<T> lhs, T rhs) {
-    Vec2<T> result = { lhs.x * rhs, lhs.y * rhs };
-    return result;
+    return { lhs.x * rhs, lhs.y * rhs };
 }
 
 template<typename T>
 Vec2<T> constexpr operator / (Vec2<T> lhs, T rhs) {
     assert(rhs != 0);
     
-    Vec2<T> result = { lhs.x / rhs, lhs.y / rhs };
-    return result;
+    return { lhs.x / rhs, lhs.y / rhs };
 }
 
 template<typename T>
@@ -110,11 +102,11 @@ Vec2<T> constexpr &operator -= (Vec2<T> &lhs, T rhs) {
 
 template<typename T>
 Vec2<T> constexpr operator -(Vec2<T> vec) {
-    Vec2<T> result = { -vec.x, -vec.y };
-    return result;
+    return { -vec.x, -vec.y };
 }
 
 using Vec2i = Vec2<int>;
+using Vec2f = Vec2<float>;
 
 template<typename T>
 T max(T a, T b) {
@@ -126,5 +118,6 @@ T min(T a, T b) {
     return a > b ? b : a;
 }
 
+const float PI = 3.141592f;
 
 #endif // VEC_CPP_

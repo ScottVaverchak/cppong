@@ -4,112 +4,23 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include "cppong_error.cpp"
 #include "vec.cpp"
+#include "cppong_debug_ui.cpp"
+#include "cppong_font.cpp"
+#include "cppong_entity.cpp"
 
 const int WINDOW_W = 800;
 const int WINDOW_H = 400;
 
-const int GAMEAREA_W = WINDOW_W * 0.9f;
-const int GAMEAREA_H = WINDOW_H * 0.75f;
-const int GAMEAREA_X = (WINDOW_W - GAMEAREA_W) / 2;
-const int GAMEAREA_Y = (WINDOW_H - GAMEAREA_H) / 2;
-
-const int BALL_SPAWN_X = GAMEAREA_X + (GAMEAREA_W / 2);
-const int BALL_SPAWN_Y = GAMEAREA_Y + (GAMEAREA_H / 2);
-
-const int BALL_RADIUS = 10;
-
-const float PI = 3.141592f;
-
-int SDL_ErrorCheck(int code) {
-    if(code < 0) {
-        printf("SDL error: %s\n", SDL_GetError());
-        abort();
-    }
-
-    return code;
-}
-
-template<typename T>
-T *SDL_ErrorCheck(T *ptr) {
-    if(ptr == nullptr) {
-        printf("SDL error: %s\n", SDL_GetError());
-        abort();
-    }
-
-    return ptr;
-}
-
-int TTF_ErrorCheck(int code) {
-    if(code != 0) {
-        printf("SDL TTF error: %s\n", TTF_GetError());
-        abort();
-    }
-
-    return code;
-}
-
-template<typename T>
-T *TTF_ErrorCheck(T *ptr) {
-    if(ptr == nullptr) {
-        printf("SDL TTF error: %s\n", TTF_GetError());
-        abort();
-    }
-
-    return ptr;
-}
-
-void draw_colored_rectangle(SDL_Renderer *renderer, SDL_Rect rect, uint32_t color) {
-
-    Uint8 r, g, b, a;
-    SDL_ErrorCheck(SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a));
-    
-    SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 
-        (color & 0xFF000000) >> 24, 
-        (color & 0x00FF0000) >> 16, 
-        (color & 0x0000FF00) >> 8, 
-        (color & 0x000000FF)));
-
-    SDL_ErrorCheck(SDL_RenderDrawRect(renderer, &rect));
-    SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, r, g, b, a));
-}
-
-void draw_colored_circle(SDL_Renderer *renderer, Vec2i position, int radius, uint32_t color) {
-    Uint8 r, g, b, a;
-    SDL_ErrorCheck(SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a));
-    SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 
-            (color & 0xFF000000) >> 24, 
-            (color & 0x00FF0000) >> 16, 
-            (color & 0x0000FF00) >> 8, 
-            (color & 0x000000FF)));
-
-    const int segments = 8;
-    assert(segments >= 3);
-
-    const float segment_radians = (2.0f * PI) / segments;
-
-    for(size_t i = 1; i <= segments; i++) {
-        const auto x = (sinf(i * segment_radians) * radius) + position.x;
-        const auto y = (cosf(i * segment_radians) * radius) + position.y;
-
-        const auto nx = (sinf((i + 1) * segment_radians) * radius) + position.x;
-        const auto ny = (cosf((i + 1) * segment_radians) * radius) + position.y;
-
-        SDL_ErrorCheck(SDL_RenderDrawLine(renderer, x, y, nx, ny));
-    }
-
-    SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, r, g, b, a));
-}
-
-struct Entity {
-    Vec2i pos;
-    Vec2i vel;
-
-    SDL_Rect hitbox;
-    SDL_Rect srcrect;
+const SDL_Rect GAMEAREA = {
+    (WINDOW_W - (WINDOW_W * 0.9f)) / 2,
+    (WINDOW_H - (WINDOW_H * 0.75f)) / 2,
+    WINDOW_W * 0.9f,
+    WINDOW_H * 0.75f
 };
 
-Vec2i ball_pos = { BALL_SPAWN_X, BALL_SPAWN_Y };
+const int BALL_RADIUS = 10;
 
 SDL_Texture *load_texture_from_file(SDL_Renderer *renderer, const char* filename) {
 
@@ -140,47 +51,34 @@ SDL_Texture *load_texture_from_file(SDL_Renderer *renderer, const char* filename
     return texture;
 }
 
-enum Rect_Side {
-    TOP,
-    RIGHT,
-    BOTTOM,
-    LEFT
-};
-
-bool paddle_ball_collision(const SDL_Rect rect, const int radius, const Vec2i ball_position) {
-    auto dx = ball_position.x - max(rect.x, min(ball_position.x, rect.x + rect.w));
-    auto dy = ball_position.y - max(rect.y, min(ball_position.y, rect.y + rect.h));
-    return (dx * dx + dy * dy) < (radius * radius);
-}
-
 int cppong_main() {
     printf("Initializing SDL...\n");
     const int PLAYER_OFFSET_X = 5;
 
     Entity player = {};
-    player.pos = { GAMEAREA_X + PLAYER_OFFSET_X, GAMEAREA_H / 2 };
-    player.hitbox = {player.pos.x, player.pos.y, 12 * 2, 30 * 2 };
+    player.pos = { (float)(GAMEAREA.x + PLAYER_OFFSET_X), GAMEAREA.h / 2.0f };
+    player.hitbox = {(int)player.pos.x, (int)player.pos.y, 12 * 2, 30 * 2 };
     player.srcrect = { 8, 1, 12, 30 }; 
 
     Entity oppo = {};
-    oppo.pos = { (GAMEAREA_X + GAMEAREA_W) - PLAYER_OFFSET_X - 12 * 2, GAMEAREA_H / 2 };
-    oppo.hitbox = {oppo.pos.x, oppo.pos.y, 12 * 2, 30 * 2 };
+    oppo.pos = { (float)(GAMEAREA.x + GAMEAREA.w) - PLAYER_OFFSET_X - 12 * 2, GAMEAREA.h / 2.0f };
+    oppo.hitbox = {(int)oppo.pos.x, (int)oppo.pos.y, 12 * 2, 30 * 2 };
     oppo.srcrect = { 8, 1, 12, 30 }; 
 
     Entity ball = {};
-    ball.pos = { BALL_SPAWN_X, BALL_SPAWN_Y};
+    ball.pos = { GAMEAREA.x + (GAMEAREA.w / 2.0f), GAMEAREA.y + (GAMEAREA.h / 2.0f) };
     ball.srcrect = {0, 0, 16, 16};
     ball.vel = { 1, 2 };
 
-    assert((player.hitbox.w * 2) < GAMEAREA_W);
-    assert(player.hitbox.h < GAMEAREA_H);    
-    assert(player.pos.x > GAMEAREA_X && player.pos.x < (GAMEAREA_W + GAMEAREA_X));
-    assert(player.pos.y > GAMEAREA_Y && player.pos.y < (GAMEAREA_H + GAMEAREA_Y));
+    assert((player.hitbox.w * 2) < GAMEAREA.w);
+    assert(player.hitbox.h < GAMEAREA.h);    
+    assert(player.pos.x > GAMEAREA.x && player.pos.x < (GAMEAREA.w + GAMEAREA.x));
+    assert(player.pos.y > GAMEAREA.y && player.pos.y < (GAMEAREA.h + GAMEAREA.y));
 
-    assert((oppo.hitbox.w * 2) < GAMEAREA_W);
-    assert(oppo.hitbox.h < GAMEAREA_H);    
-    assert(oppo.pos.x > GAMEAREA_X && oppo.pos.x < (GAMEAREA_W + GAMEAREA_X));
-    assert(oppo.pos.y > GAMEAREA_Y && oppo.pos.y < (GAMEAREA_H + GAMEAREA_Y));
+    assert((oppo.hitbox.w * 2) < GAMEAREA.w);
+    assert(oppo.hitbox.h < GAMEAREA.h);    
+    assert(oppo.pos.x > GAMEAREA.x && oppo.pos.x < (GAMEAREA.w + GAMEAREA.x));
+    assert(oppo.pos.y > GAMEAREA.y && oppo.pos.y < (GAMEAREA.h + GAMEAREA.y));
 
     SDL_ErrorCheck(SDL_Init(SDL_INIT_VIDEO));
     SDL_Window *window = SDL_ErrorCheck(SDL_CreateWindow("cppong", 
@@ -192,9 +90,6 @@ int cppong_main() {
     SDL_Renderer *renderer = SDL_ErrorCheck(SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED));
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
 
-    SDL_Rect world = {GAMEAREA_X, GAMEAREA_Y, GAMEAREA_W, GAMEAREA_H};
-
-    // Font below
     TTF_ErrorCheck(TTF_Init());    
     TTF_Font *main_font = TTF_ErrorCheck(TTF_OpenFont("assets/uni0553-webfont.ttf", 32));
     SDL_Surface *font_surface = TTF_ErrorCheck(TTF_RenderText_Blended(main_font, "cppong++", {255, 0, 255}));
@@ -242,7 +137,7 @@ int cppong_main() {
             dy = 1;
         }
 
-        if(player.pos.y + dy >= GAMEAREA_Y && (player.pos.y + dy + player.hitbox.h) < GAMEAREA_Y + GAMEAREA_H)
+        if(player.pos.y + dy >= GAMEAREA.y && (player.pos.y + dy + player.hitbox.h) < GAMEAREA.y + GAMEAREA.h)
         {
             player.pos.y += dy * 2;
             oppo.pos.y += dy * 2;
@@ -250,14 +145,15 @@ int cppong_main() {
 
         ball.pos += ball.vel;
 
-        if(ball.pos.x > GAMEAREA_X + GAMEAREA_W || ball.pos.x < GAMEAREA_X)
+        if((ball.pos.x + BALL_RADIUS) > GAMEAREA.x + GAMEAREA.w || (ball.pos.x - BALL_RADIUS) < GAMEAREA.x)
             ball.vel *= {-1, 1};
-        if(ball.pos.y > GAMEAREA_Y + GAMEAREA_H || ball.pos.y < GAMEAREA_Y)
+
+        if((ball.pos.y + BALL_RADIUS) > GAMEAREA.y + GAMEAREA.h || (ball.pos.y - BALL_RADIUS) < GAMEAREA.y)
             ball.vel *= {1, -1};
 
-        SDL_Rect play_rectm = {player.pos.x, player.pos.y, player.hitbox.w, player.hitbox.h };
-        SDL_Rect oppo_rectm = {oppo.pos.x, oppo.pos.y, oppo.hitbox.w, oppo.hitbox.h };
-        SDL_Rect ball_rectm = {ball.pos.x - BALL_RADIUS, ball.pos.y - BALL_RADIUS, BALL_RADIUS * 2, BALL_RADIUS * 2 };
+        SDL_Rect play_rectm = {(int)player.pos.x, (int)player.pos.y, player.hitbox.w, player.hitbox.h };
+        SDL_Rect oppo_rectm = {(int)oppo.pos.x, (int)oppo.pos.y, oppo.hitbox.w, oppo.hitbox.h };
+        SDL_Rect ball_rectm = {(int)ball.pos.x - BALL_RADIUS, (int)ball.pos.y - BALL_RADIUS, BALL_RADIUS * 2, BALL_RADIUS * 2 };
                              
         if(paddle_ball_collision(play_rectm, BALL_RADIUS, ball.pos))
             ball.vel *= {-1, 1};
@@ -277,14 +173,9 @@ int cppong_main() {
         SDL_RenderCopy(renderer, font_texture, nullptr, &font_rect);
 
         if(display_debug) {
-            SDL_Rect play_pos = {player.pos.x, player.pos.y, 2, 2 };
-            SDL_Rect oppo_pos = {oppo.pos.x, oppo.pos.y, 2, 2  };
-
             draw_colored_rectangle(renderer, play_rectm, 0x0000FFFF);
-            draw_colored_rectangle(renderer, play_pos, 0xFF00FFFF);
             draw_colored_rectangle(renderer, oppo_rectm, 0xFFFFFFFF);
-            draw_colored_rectangle(renderer, oppo_pos, 0x0000FFFF);
-            draw_colored_rectangle(renderer, world, 0xFF0000FF);
+            draw_colored_rectangle(renderer, GAMEAREA, 0xFF0000FF);
             draw_colored_circle(renderer, ball.pos, BALL_RADIUS, 0xFF00FFFF);
         }
 
