@@ -41,7 +41,7 @@ void render_text(FontCache *font_cache, SDL_Renderer *renderer, const char *text
     const float padding = 2 * aspect_ratio;
     for(int i = 0; i < text_length; i++) {
         int ascii = (int)text[i];
-        if(ascii > HIGH_END_ASCII || ascii > HIGH_END_ASCII)
+        if(ascii < LOW_END_ASCII || ascii > HIGH_END_ASCII)
             continue;
 
         SDL_Texture *char_texture = font_cache->textures[ascii - 32];
