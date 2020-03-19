@@ -1,6 +1,9 @@
 # TO DO TODO
 
 * Text rendering should be as easy as this is to type 
+    * FontCache is working
+    * Need to add the ability to calculate width and height in the init function
+    * Texture vs Surface? 
 * Angle of the bounce should be depend on a few factors 
     * Where did the ball hit the paddle 
         * 0.0f - 1.0f
@@ -15,7 +18,7 @@
     * Game Over State 
         * Some Sick Credits State
 * Sprite sheets
-    * spritesheet.sheet
+    * sprite.sheet
         * filename
         * sprite atlas description: 
             : x1: 100, x2: 200, y1: 0, y2: 100

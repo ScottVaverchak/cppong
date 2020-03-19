@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cstdint>
 #include <cassert>
+#include <iostream>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -68,7 +69,7 @@ int cppong_main() {
     Entity ball = {};
     ball.pos = { GAMEAREA.x + (GAMEAREA.w / 2.0f), GAMEAREA.y + (GAMEAREA.h / 2.0f) };
     ball.srcrect = {0, 0, 16, 16};
-    ball.vel = { 1, 2 };
+    ball.vel = { 2, 4 };
 
     // TODO: are these asserts needed?
     assert((player.hitbox.w * 2) < GAMEAREA.w);
@@ -91,17 +92,10 @@ int cppong_main() {
     SDL_Renderer *renderer = SDL_ErrorCheck(SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED));
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
 
-    // TODO: fonts are too hard to work with
     TTF_ErrorCheck(TTF_Init());    
-    TTF_Font *main_font = TTF_ErrorCheck(TTF_OpenFont("assets/uni0553-webfont.ttf", 32));
-    SDL_Surface *font_surface = TTF_ErrorCheck(TTF_RenderText_Blended(main_font, "cppong++", {255, 0, 255}));
-    SDL_Texture *font_texture = SDL_ErrorCheck(SDL_CreateTextureFromSurface(renderer, font_surface));
-    
-    SDL_FreeSurface(font_surface);
 
-    int font_width, font_height;
-    SDL_ErrorCheck(SDL_QueryTexture(font_texture, nullptr, nullptr, &font_width, &font_height));
-    SDL_Rect font_rect = { (WINDOW_W / 2) - (font_width / 2), 0, font_width, font_height};
+    FontCache *fc;
+    init_font_cache(&fc, "assets/uni0553-webfont.ttf", renderer);
 
     SDL_Texture *paddle_texture = load_texture_from_file(renderer, "assets/RAM.png");
     SDL_Texture *spritesheet_texture = load_texture_from_file(renderer, "assets/spritesheet.png");
@@ -172,7 +166,8 @@ int cppong_main() {
         
         SDL_ErrorCheck(SDL_RenderCopy(renderer, spritesheet_texture, &ball.srcrect, &ball_rectm));
 
-        SDL_RenderCopy(renderer, font_texture, nullptr, &font_rect);
+        render_text(fc, renderer, "cppong++", 32, {(WINDOW_W / 2), 0});
+        render_text(fc, renderer, "so much game",48, { GAMEAREA.x, GAMEAREA.h + 48});
 
         if(display_debug) {
             draw_colored_rectangle(renderer, play_rectm, 0x0000FFFF);
@@ -191,7 +186,6 @@ int cppong_main() {
     printf("Exiting gracefully... :)\n");
     
     SDL_DestroyWindow(window);
-    TTF_CloseFont(main_font);
 
     TTF_Quit();
     SDL_Quit();
