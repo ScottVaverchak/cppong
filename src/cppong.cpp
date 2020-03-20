@@ -104,6 +104,8 @@ int cppong_main() {
     bool display_debug = false;
 
     SDL_Event e;
+    Vec2f left_coll_pos = {};
+    Vec2f right_coll_pos = {};
 
     Uint32 prev_dt = 1;
     
@@ -150,12 +152,24 @@ int cppong_main() {
         SDL_Rect play_rectm = {(int)player.pos.x, (int)player.pos.y, player.hitbox.w, player.hitbox.h };
         SDL_Rect oppo_rectm = {(int)oppo.pos.x, (int)oppo.pos.y, oppo.hitbox.w, oppo.hitbox.h };
         SDL_Rect ball_rectm = {(int)ball.pos.x - BALL_RADIUS, (int)ball.pos.y - BALL_RADIUS, BALL_RADIUS * 2, BALL_RADIUS * 2 };
-                             
-        if(paddle_ball_collision(play_rectm, BALL_RADIUS, ball.pos))
-            ball.vel *= {-1, 1};
 
-        if(paddle_ball_collision(oppo_rectm, BALL_RADIUS, ball.pos))
+
+        CollisionRecord left_paddle_coll = {};
+        if(paddle_ball_collision(play_rectm, BALL_RADIUS, ball.pos, &left_paddle_coll)) {
+            left_coll_pos.x = play_rectm.x + 24;
+            left_coll_pos.y = (left_paddle_coll.world_position.y - play_rectm.y);
+
             ball.vel *= {-1, 1};
+        }
+            
+
+        CollisionRecord right_paddle_coll = {};
+        if(paddle_ball_collision(oppo_rectm, BALL_RADIUS, ball.pos, &right_paddle_coll)) {
+            right_coll_pos.x = oppo_rectm.x;
+            right_coll_pos.y = (right_paddle_coll.world_position.y - oppo_rectm.y);
+            ball.vel *= {-1, 1};
+        }
+            
 
         SDL_ErrorCheck(SDL_RenderClear(renderer));
         SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x22, 0x22, 0x22, 0xFF));
@@ -174,6 +188,9 @@ int cppong_main() {
             draw_colored_rectangle(renderer, oppo_rectm, 0xFFFFFFFF);
             draw_colored_rectangle(renderer, GAMEAREA, 0xFF0000FF);
             draw_colored_circle(renderer, ball.pos, BALL_RADIUS, 0xFF00FFFF);
+            draw_colored_circle(renderer, { left_coll_pos.x, left_coll_pos.y + play_rectm.y}, 6, 0xFF00FFFF);
+            draw_colored_circle(renderer, { right_coll_pos.x, right_coll_pos.y + oppo_rectm.y}, 6, 0xFF00FFFF);
+        
         }
 
         SDL_RenderPresent(renderer);

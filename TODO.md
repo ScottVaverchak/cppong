@@ -1,15 +1,20 @@
 # TO DO TODO
 
-* Text rendering should be as easy as this is to type 
-    * FontCache is working
-    * Need to add the ability to calculate width and height in the init function
-    * Texture vs Surface? 
+* Make the collision better
+    * Based on the side of the collision, the vector should change
+        * T/B: {  1, -1 }
+        * L/R: { -1,  1 }
 * Angle of the bounce should be depend on a few factors 
     * Where did the ball hit the paddle 
+        * Currently tracking a very ditry and terrible position of collision
         * 0.0f - 1.0f
     * Was the paddle moving and for how long?
         * This would allow "power" hits
-    * Possibly add round caps to the paddles 
+* Sprite sheets
+    * sprite.sheet
+        * filename
+        * sprite atlas description: 
+            : x1: 100, x2: 200, y1: 0, y2: 100
 * Introduce GameState
     * Main Menu State
         * Options Screen
@@ -17,8 +22,6 @@
         * Pause State 
     * Game Over State 
         * Some Sick Credits State
-* Sprite sheets
-    * sprite.sheet
-        * filename
-        * sprite atlas description: 
-            : x1: 100, x2: 200, y1: 0, y2: 100
+* Text Rendering (-_-)
+    * Perhaps the fonts should be rendered to one large, square texture
+        * Will SDL optimize this to send it to the GPU only once?
