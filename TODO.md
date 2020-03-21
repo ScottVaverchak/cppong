@@ -1,8 +1,7 @@
 # TO DO TODO
 
-* Make this legit Modern C++ by guessing and hoping for the best 
-    * Currently this is more C than Modern C++
-    * The goal of this project is to learn Modern C++ I think
+* SDL_Rect should only be used for rendering
+    * Create a new type used everywhere outside of rendering
 * Make the collision better
     * Based on the side of the collision, the vector should change
         * T/B: {  1, -1 }
@@ -28,3 +27,7 @@
 * Text Rendering (-_-)
     * Perhaps the fonts should be rendered to one large, square texture
         * Will SDL optimize this to send it to the GPU only once?
+* Make this legit Modern C++ by guessing and hoping for the best 
+    * Currently this is more C than Modern C++
+    * The goal of this project is to learn Modern C++ I think
+* Switch to OpenGL for rendering 
