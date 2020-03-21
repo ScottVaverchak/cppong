@@ -6,7 +6,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "cppong_error.cpp"
-#include "vec.cpp"
+#include "cppong_vec.cpp"
+#include "cppong_rect.cpp"
 #include "cppong_debug_ui.cpp"
 #include "cppong_font.cpp"
 #include "cppong_entity.cpp"
