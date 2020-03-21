@@ -15,10 +15,10 @@ const int WINDOW_W = 800;
 const int WINDOW_H = 400;
 
 const SDL_Rect GAMEAREA = {
-    (WINDOW_W - (WINDOW_W * 0.9f)) / 2,
-    (WINDOW_H - (WINDOW_H * 0.75f)) / 2,
-    WINDOW_W * 0.9f,
-    WINDOW_H * 0.75f
+    static_cast<int>((WINDOW_W - (WINDOW_W * 0.9f)) / 2),
+    static_cast<int>((WINDOW_H - (WINDOW_H * 0.75f)) / 2),
+    static_cast<int>(WINDOW_W * 0.9f),
+    static_cast<int>(WINDOW_H * 0.75f)
 };
 
 const int BALL_RADIUS = 10;

@@ -9,5 +9,5 @@ ASSETS=assets
 cppong: src/macos_cppong.cpp
 	rm -rf $(OUTPUT)
 	mkdir -p $(OUTPUT) $(OUTPUTASSETS)
-	# cp -r $(ASSETS) $(OUTPUT)/$(ASSETS)
+	cp -r $(ASSETS) $(OUTPUT)/$(ASSETS)
 	$(CXX) $(CXXFLAGS) -o $(OUTPUT)/cppong src/macos_cppong.cpp $(LIBS)
