@@ -1,5 +1,8 @@
 # TO DO TODO
 
+* Make this legit Modern C++ by guessing and hoping for the best 
+    * Currently this is more C than Modern C++
+    * The goal of this project is to learn Modern C++ I think
 * Make the collision better
     * Based on the side of the collision, the vector should change
         * T/B: {  1, -1 }
