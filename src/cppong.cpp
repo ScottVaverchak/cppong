@@ -59,12 +59,12 @@ int cppong_main() {
 
     Entity player = {};
     player.pos = { (float)(GAMEAREA.x + PLAYER_OFFSET_X), GAMEAREA.h / 2.0f };
-    player.hitbox = {(int)player.pos.x, (int)player.pos.y, 12 * 2, 30 * 2 };
+    player.hitbox = rect(player.pos, 24.0f, 60.0f);
     player.srcrect = { 8, 1, 12, 30 }; 
 
     Entity oppo = {};
     oppo.pos = { (float)(GAMEAREA.x + GAMEAREA.w) - PLAYER_OFFSET_X - 12 * 2, GAMEAREA.h / 2.0f };
-    oppo.hitbox = {(int)oppo.pos.x, (int)oppo.pos.y, 12 * 2, 30 * 2 };
+    oppo.hitbox = rect(oppo.pos, 24.0f, 60.0f);
     oppo.srcrect = { 8, 1, 12, 30 }; 
 
     Entity ball = {};
@@ -150,9 +150,10 @@ int cppong_main() {
         if((ball.pos.y + BALL_RADIUS) > GAMEAREA.y + GAMEAREA.h || (ball.pos.y - BALL_RADIUS) < GAMEAREA.y)
             ball.vel *= {1, -1};
 
-        SDL_Rect play_rectm = {(int)player.pos.x, (int)player.pos.y, player.hitbox.w, player.hitbox.h };
-        SDL_Rect oppo_rectm = {(int)oppo.pos.x, (int)oppo.pos.y, oppo.hitbox.w, oppo.hitbox.h };
-        SDL_Rect ball_rectm = {(int)ball.pos.x - BALL_RADIUS, (int)ball.pos.y - BALL_RADIUS, BALL_RADIUS * 2, BALL_RADIUS * 2 };
+        Rectf play_rectm = rect(player.pos, player.hitbox.w, player.hitbox.h);
+        Rectf oppo_rectm = rect(oppo.pos, oppo.hitbox.w, oppo.hitbox.h);
+        auto ball_dia = static_cast<float>(BALL_RADIUS * 2.0f);
+        Rectf ball_rectm = rect(ball.pos - static_cast<float>(BALL_RADIUS), ball_dia, ball_dia);
 
 
         CollisionRecord left_paddle_coll = {};
@@ -174,19 +175,24 @@ int cppong_main() {
 
         SDL_ErrorCheck(SDL_RenderClear(renderer));
         SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x22, 0x22, 0x22, 0xFF));
-        SDL_ErrorCheck(SDL_RenderCopy(renderer, paddle_texture, &player.srcrect, &play_rectm));
+        
+        SDL_Rect play_rect = rect_to_sdl(play_rectm);
+        SDL_Rect oppo_rect = rect_to_sdl(oppo_rectm);
+        SDL_Rect ball_rect = rect_to_sdl(ball_rectm);
+
+        SDL_ErrorCheck(SDL_RenderCopy(renderer, paddle_texture, &player.srcrect, &play_rect));
         SDL_ErrorCheck(SDL_RenderCopyEx(renderer, paddle_texture, 
-                                        &oppo.srcrect, &oppo_rectm, 0, 
+                                        &oppo.srcrect, &oppo_rect, 0, 
                                         nullptr, SDL_FLIP_HORIZONTAL));
         
-        SDL_ErrorCheck(SDL_RenderCopy(renderer, spritesheet_texture, &ball.srcrect, &ball_rectm));
+        SDL_ErrorCheck(SDL_RenderCopy(renderer, spritesheet_texture, &ball.srcrect, &ball_rect));
 
         render_text(fc, renderer, "cppong++", 32, {(WINDOW_W / 2), 0});
         render_text(fc, renderer, "so much game",48, { GAMEAREA.x, GAMEAREA.h + 48});
 
         if(display_debug) {
-            draw_colored_rectangle(renderer, play_rectm, 0x0000FFFF);
-            draw_colored_rectangle(renderer, oppo_rectm, 0xFFFFFFFF);
+            draw_colored_rectangle(renderer, play_rect, 0x0000FFFF);
+            draw_colored_rectangle(renderer, oppo_rect, 0xFFFFFFFF);
             draw_colored_rectangle(renderer, GAMEAREA, 0xFF0000FF);
             draw_colored_circle(renderer, ball.pos, BALL_RADIUS, 0xFF00FFFF);
             draw_colored_circle(renderer, { left_coll_pos.x, left_coll_pos.y + play_rectm.y}, 6, 0xFF00FFFF);

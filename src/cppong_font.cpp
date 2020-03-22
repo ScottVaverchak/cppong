@@ -16,7 +16,6 @@ struct FontCache {
 void init_font_cache(FontCache **font_cache, const char *font_location, SDL_Renderer *renderer) {
     FontCache *fc = new FontCache;
     
-    // fc->textures = new SDL_Texture*[HIGH_END_ASCII - LOW_END_ASCII];
     fc->char_textures = new CharTexture[HIGH_END_ASCII - LOW_END_ASCII];
     fc->font_location = font_location;
     fc->font_size = 32.0f;
