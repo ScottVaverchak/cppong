@@ -1,5 +1,3 @@
-#ifndef VEC_CPP_
-#define VEC_CPP_
 
 template<typename T>
 struct Vec2 {
@@ -119,5 +117,3 @@ T min(T a, T b) {
 }
 
 const float PI = 3.141592f;
-
-#endif // VEC_CPP_

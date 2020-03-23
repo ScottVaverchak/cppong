@@ -11,6 +11,7 @@
 #include "cppong_debug_ui.cpp"
 #include "cppong_font.cpp"
 #include "cppong_entity.cpp"
+#include "cppong_renderer.cpp"
 
 const int WINDOW_W = 800;
 const int WINDOW_H = 400;
@@ -152,6 +153,7 @@ int cppong_main() {
 
         Rectf play_rectm = rect(player.pos, player.hitbox.w, player.hitbox.h);
         Rectf oppo_rectm = rect(oppo.pos, oppo.hitbox.w, oppo.hitbox.h);
+
         auto ball_dia = static_cast<float>(BALL_RADIUS * 2.0f);
         Rectf ball_rectm = rect(ball.pos - static_cast<float>(BALL_RADIUS), ball_dia, ball_dia);
 
@@ -179,7 +181,7 @@ int cppong_main() {
         SDL_Rect play_rect = rect_to_sdl(play_rectm);
         SDL_Rect oppo_rect = rect_to_sdl(oppo_rectm);
         SDL_Rect ball_rect = rect_to_sdl(ball_rectm);
-
+        
         SDL_ErrorCheck(SDL_RenderCopy(renderer, paddle_texture, &player.srcrect, &play_rect));
         SDL_ErrorCheck(SDL_RenderCopyEx(renderer, paddle_texture, 
                                         &oppo.srcrect, &oppo_rect, 0, 
@@ -191,9 +193,9 @@ int cppong_main() {
         render_text(fc, renderer, "so much game",48, { GAMEAREA.x, GAMEAREA.h + 48});
 
         if(display_debug) {
-            draw_colored_rectangle(renderer, play_rect, 0x0000FFFF);
-            draw_colored_rectangle(renderer, oppo_rect, 0xFFFFFFFF);
-            draw_colored_rectangle(renderer, GAMEAREA, 0xFF0000FF);
+            draw_colored_rectangle(renderer, play_rectm, 0x0000FFFF);
+            draw_colored_rectangle(renderer, oppo_rectm, 0xFFFFFFFF);
+            draw_colored_rectangle(renderer, sdl_to_rect<float>(GAMEAREA), 0xFF0000FF);
             draw_colored_circle(renderer, ball.pos, BALL_RADIUS, 0xFF00FFFF);
             draw_colored_circle(renderer, { left_coll_pos.x, left_coll_pos.y + play_rectm.y}, 6, 0xFF00FFFF);
             draw_colored_circle(renderer, { right_coll_pos.x, right_coll_pos.y + oppo_rectm.y}, 6, 0xFF00FFFF);

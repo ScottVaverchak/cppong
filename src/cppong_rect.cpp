@@ -9,6 +9,11 @@ Rect<T> constexpr rect(Vec2<T> pos, T w, T h) {
 }
 
 template <typename T>
+Rect<T> constexpr rect(T x, T y, T w, T h) {
+    return { x, y, w, h };
+}
+
+template <typename T>
 Rect<T> constexpr operator + (Rect<T> lhs, Vec2<T> rhs) { 
     return { lhs.x + rhs.x, lhs.y + rhs.y, lhs.w, lhs.w };
 }
@@ -43,5 +48,14 @@ SDL_Rect rect_to_sdl(Rect<float> rect) {
     };
 }
 
-using Rectf = Rect<float>;
+template <typename T>
+Rect<T> sdl_to_rect(SDL_Rect rect) {
+    return {
+        (T) rect.x, 
+        (T) rect.y,
+        (T) rect.w,
+        (T) rect.h
+    };
+}
 
+using Rectf = Rect<float>;
