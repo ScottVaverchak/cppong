@@ -44,7 +44,7 @@ void init_font_cache(FontCache **font_cache, const char *font_location, SDL_Rend
 }
 
 
-void render_text(FontCache *font_cache, SDL_Renderer *renderer, const char *text, float font_size, Vec2i position) {
+void render_text(FontCache *font_cache, SDL_Renderer *renderer, const char *text, float font_size, Vec2f position) {
     const size_t text_length = strlen(text);
     float xoffset = 0;
     const float aspect_ratio = font_size / font_cache->font_size;
@@ -57,7 +57,7 @@ void render_text(FontCache *font_cache, SDL_Renderer *renderer, const char *text
         CharTexture char_texture = font_cache->char_textures[ascii - 32];
       
         auto width = char_texture.width * aspect_ratio;
-        SDL_Rect location = {position.x + (int)xoffset, position.y, (int)width, (int)font_size };
+        SDL_Rect location = {(int)position.x + (int)xoffset, (int)position.y, (int)width, (int)font_size };
         xoffset += width + padding;
 
         SDL_RenderCopy(renderer, char_texture.texture, nullptr, &location);

@@ -2,21 +2,35 @@ struct Entity {
     Vec2f pos;
     Vec2f vel;
 
-    Rectf hitbox;
+    float w, h;
     SDL_Rect srcrect;
+    SDL_RendererFlip flipmode = SDL_FLIP_NONE;
+
+    constexpr Rectf dstrect() const {
+        return rect(pos - vec2(w * 0.5f, h * 0.5f), w, h);
+    }
+};
+
+struct Paddle : Entity {
+    Rectf hitbox;
+};
+
+struct Ball : Entity {
+    float radius;
 };
 
 struct CollisionRecord {
     Vec2f world_position;
 };
 
+bool paddle_ball_collision(const Paddle paddle, const Ball ball, CollisionRecord *record) {
+    auto hitbox = paddle.dstrect();
 
-bool paddle_ball_collision(const Rectf rect, const int radius, const Vec2f ball_position, CollisionRecord *record) {
-    auto dx = ball_position.x - max(rect.x, min(ball_position.x, rect.x + rect.w));
-    auto dy = ball_position.y - max(rect.y, min(ball_position.y, rect.y + rect.h));
+    auto dx = ball.pos.x - max(hitbox.x, min(ball.pos.x, hitbox.x + hitbox.w));
+    auto dy = ball.pos.y - max(hitbox.y, min(ball.pos.y, hitbox.y + hitbox.h));
 
-    record->world_position.x = ball_position.x;
-    record->world_position.y = ball_position.y;
+    record->world_position.x = ball.pos.x;
+    record->world_position.y = ball.pos.y;
     
-    return (dx * dx + dy * dy) < (radius * radius);
+    return (dx * dx + dy * dy) < (ball.radius * ball.radius);
 }

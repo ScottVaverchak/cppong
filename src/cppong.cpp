@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <cassert>
 #include <iostream>
+#include <vector>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -17,72 +18,38 @@ const int WINDOW_W = 800;
 const int WINDOW_H = 400;
 
 const SDL_Rect GAMEAREA = {
-    static_cast<int>((WINDOW_W - (WINDOW_W * 0.9f)) / 2),
-    static_cast<int>((WINDOW_H - (WINDOW_H * 0.75f)) / 2),
+    static_cast<int>((WINDOW_W - (WINDOW_W * 0.9f)) * 0.5f),
+    static_cast<int>((WINDOW_H - (WINDOW_H * 0.75f)) * 0.5f),
     static_cast<int>(WINDOW_W * 0.9f),
     static_cast<int>(WINDOW_H * 0.75f)
 };
 
-const int BALL_RADIUS = 10;
-
-SDL_Texture *load_texture_from_file(SDL_Renderer *renderer, const char* filename) {
-
-    int image_width, image_height, image_channels;
-    unsigned char *image = stbi_load(filename, &image_width, &image_height, &image_channels, STBI_rgb_alpha);
-
-    if(image == nullptr) {
-        printf("Error loading: %s", filename);
-        abort();
-    }
-
-    SDL_Surface *image_surface = SDL_ErrorCheck(SDL_CreateRGBSurfaceFrom(
-        image, 
-        image_width, 
-        image_height, 
-        32,
-        image_width * 4,
-        0x000000FF,
-        0x0000FF00,
-        0x00FF0000,
-        0xFF000000
-    ));
-
-    SDL_Texture *texture = SDL_ErrorCheck(SDL_CreateTextureFromSurface(renderer, image_surface));
-    
-    stbi_image_free(image);
-    
-    return texture;
-}
-
 int cppong_main() {
     printf("Initializing SDL...\n");
-    const int PLAYER_OFFSET_X = 5;
+    const int PLAYER_OFFSET_X = 10;
 
-    Entity player = {};
-    player.pos = { (float)(GAMEAREA.x + PLAYER_OFFSET_X), GAMEAREA.h / 2.0f };
+    Paddle player = {};
+    player.pos = { (float)(GAMEAREA.x + PLAYER_OFFSET_X), GAMEAREA.h * 0.5f };
     player.hitbox = rect(player.pos, 24.0f, 60.0f);
-    player.srcrect = { 8, 1, 12, 30 }; 
+    player.srcrect = {16, 0, 16, 16 * 3};
+    player.w = 16.0f;
+    player.h = 16.0f * 3.0f;
 
-    Entity oppo = {};
-    oppo.pos = { (float)(GAMEAREA.x + GAMEAREA.w) - PLAYER_OFFSET_X - 12 * 2, GAMEAREA.h / 2.0f };
+    Paddle oppo = {};
+    oppo.pos = { (float)(GAMEAREA.x + GAMEAREA.w) - PLAYER_OFFSET_X, GAMEAREA.h * 0.5f };
     oppo.hitbox = rect(oppo.pos, 24.0f, 60.0f);
-    oppo.srcrect = { 8, 1, 12, 30 }; 
+    oppo.srcrect = {16, 0, 16, 16 * 3};
+    oppo.w = 16.0f;
+    oppo.h = 16.0f * 3.0f;
 
-    Entity ball = {};
-    ball.pos = { GAMEAREA.x + (GAMEAREA.w / 2.0f), GAMEAREA.y + (GAMEAREA.h / 2.0f) };
+    Ball ball = {};
+    ball.pos = { GAMEAREA.x + (GAMEAREA.w * 0.5f), GAMEAREA.y + (GAMEAREA.h * 0.5f) };
     ball.srcrect = {0, 0, 16, 16};
-    ball.vel = { 2, 4 };
+    ball.vel = { 2, 0 };
+    ball.w = ball.h = 16.0f;
+    ball.radius = 16.0f * 0.5f;
 
-    // TODO: are these asserts needed?
-    assert((player.hitbox.w * 2) < GAMEAREA.w);
-    assert(player.hitbox.h < GAMEAREA.h);    
-    assert(player.pos.x > GAMEAREA.x && player.pos.x < (GAMEAREA.w + GAMEAREA.x));
-    assert(player.pos.y > GAMEAREA.y && player.pos.y < (GAMEAREA.h + GAMEAREA.y));
-
-    assert((oppo.hitbox.w * 2) < GAMEAREA.w);
-    assert(oppo.hitbox.h < GAMEAREA.h);    
-    assert(oppo.pos.x > GAMEAREA.x && oppo.pos.x < (GAMEAREA.w + GAMEAREA.x));
-    assert(oppo.pos.y > GAMEAREA.y && oppo.pos.y < (GAMEAREA.h + GAMEAREA.y));
+    std::vector<Entity*> entities = { &player, &oppo, &ball};
 
     SDL_ErrorCheck(SDL_Init(SDL_INIT_VIDEO));
     SDL_Window *window = SDL_ErrorCheck(SDL_CreateWindow("cppong", 
@@ -99,11 +66,10 @@ int cppong_main() {
     FontCache *fc;
     init_font_cache(&fc, "assets/uni0553-webfont.ttf", renderer);
 
-    SDL_Texture *paddle_texture = load_texture_from_file(renderer, "assets/RAM.png");
     SDL_Texture *spritesheet_texture = load_texture_from_file(renderer, "assets/spritesheet.png");
 
     bool quit = false;
-    bool display_debug = false;
+    bool display_debug = true;
 
     SDL_Event e;
     Vec2f left_coll_pos = {};
@@ -131,13 +97,14 @@ int cppong_main() {
 
         const uint8_t *keyboard_state = SDL_GetKeyboardState(NULL);
         int8_t dy = 0;
+
         if(keyboard_state[SDL_SCANCODE_UP]) {
             dy = -1;
         } else if (keyboard_state[SDL_SCANCODE_DOWN]) {
             dy = 1;
         }
 
-        if(player.pos.y + dy >= GAMEAREA.y && (player.pos.y + dy + player.hitbox.h) < GAMEAREA.y + GAMEAREA.h)
+        if((player.dstrect().y + dy) >= GAMEAREA.y && (player.dstrect().y + dy + player.dstrect().h) < GAMEAREA.y + GAMEAREA.h)
         {
             player.pos.y += dy * 2;
             oppo.pos.y += dy * 2;
@@ -145,60 +112,44 @@ int cppong_main() {
 
         ball.pos += ball.vel;
 
-        if((ball.pos.x + BALL_RADIUS) > GAMEAREA.x + GAMEAREA.w || (ball.pos.x - BALL_RADIUS) < GAMEAREA.x)
+        if((ball.pos.x + ball.radius) > GAMEAREA.x + GAMEAREA.w || (ball.pos.x - ball.radius) < GAMEAREA.x)
             ball.vel *= {-1, 1};
 
-        if((ball.pos.y + BALL_RADIUS) > GAMEAREA.y + GAMEAREA.h || (ball.pos.y - BALL_RADIUS) < GAMEAREA.y)
+        if((ball.pos.y + ball.radius) > GAMEAREA.y + GAMEAREA.h || (ball.pos.y - ball.radius) < GAMEAREA.y)
             ball.vel *= {1, -1};
 
-        Rectf play_rectm = rect(player.pos, player.hitbox.w, player.hitbox.h);
-        Rectf oppo_rectm = rect(oppo.pos, oppo.hitbox.w, oppo.hitbox.h);
-
-        auto ball_dia = static_cast<float>(BALL_RADIUS * 2.0f);
-        Rectf ball_rectm = rect(ball.pos - static_cast<float>(BALL_RADIUS), ball_dia, ball_dia);
-
-
         CollisionRecord left_paddle_coll = {};
-        if(paddle_ball_collision(play_rectm, BALL_RADIUS, ball.pos, &left_paddle_coll)) {
-            left_coll_pos.x = play_rectm.x + 24;
-            left_coll_pos.y = (left_paddle_coll.world_position.y - play_rectm.y);
-
+        if(paddle_ball_collision(player, ball, &left_paddle_coll)) {
+            left_coll_pos.x = player.pos.x + (player.w * 0.5f);
+            left_coll_pos.y = (left_paddle_coll.world_position.y - player.h);
             ball.vel *= {-1, 1};
         }
             
-
         CollisionRecord right_paddle_coll = {};
-        if(paddle_ball_collision(oppo_rectm, BALL_RADIUS, ball.pos, &right_paddle_coll)) {
-            right_coll_pos.x = oppo_rectm.x;
-            right_coll_pos.y = (right_paddle_coll.world_position.y - oppo_rectm.y);
+        if(paddle_ball_collision(oppo, ball, &right_paddle_coll)) {
+            right_coll_pos.x = oppo.pos.x - (oppo.w * 0.5f);
+            right_coll_pos.y = (right_paddle_coll.world_position.y - oppo.h);
             ball.vel *= {-1, 1};
         }
-            
 
         SDL_ErrorCheck(SDL_RenderClear(renderer));
         SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x22, 0x22, 0x22, 0xFF));
         
-        SDL_Rect play_rect = rect_to_sdl(play_rectm);
-        SDL_Rect oppo_rect = rect_to_sdl(oppo_rectm);
-        SDL_Rect ball_rect = rect_to_sdl(ball_rectm);
-        
-        SDL_ErrorCheck(SDL_RenderCopy(renderer, paddle_texture, &player.srcrect, &play_rect));
-        SDL_ErrorCheck(SDL_RenderCopyEx(renderer, paddle_texture, 
-                                        &oppo.srcrect, &oppo_rect, 0, 
-                                        nullptr, SDL_FLIP_HORIZONTAL));
-        
-        SDL_ErrorCheck(SDL_RenderCopy(renderer, spritesheet_texture, &ball.srcrect, &ball_rect));
-
-        render_text(fc, renderer, "cppong++", 32, {(WINDOW_W / 2), 0});
-        render_text(fc, renderer, "so much game",48, { GAMEAREA.x, GAMEAREA.h + 48});
+        render_entities(renderer, entities, spritesheet_texture);
+        render_text(fc, renderer, "cppong++", 32, {(WINDOW_W * 0.5f), 0.0f });
+        render_text(fc, renderer, "so much game",48, { (float)GAMEAREA.x, GAMEAREA.h + 48.0f});
 
         if(display_debug) {
-            draw_colored_rectangle(renderer, play_rectm, 0x0000FFFF);
-            draw_colored_rectangle(renderer, oppo_rectm, 0xFFFFFFFF);
+            draw_colored_rectangle(renderer, player.dstrect(), 0x0000FFFF);
+            draw_colored_rectangle(renderer, oppo.dstrect(), 0xFFFFFFFF);
             draw_colored_rectangle(renderer, sdl_to_rect<float>(GAMEAREA), 0xFF0000FF);
-            draw_colored_circle(renderer, ball.pos, BALL_RADIUS, 0xFF00FFFF);
-            draw_colored_circle(renderer, { left_coll_pos.x, left_coll_pos.y + play_rectm.y}, 6, 0xFF00FFFF);
-            draw_colored_circle(renderer, { right_coll_pos.x, right_coll_pos.y + oppo_rectm.y}, 6, 0xFF00FFFF);
+            draw_colored_circle(renderer, ball.pos, ball.radius, 0xFF00FFFF);
+            
+            draw_colored_circle(renderer, { left_coll_pos.x, left_coll_pos.y + player.h}, 6, 0xFF00FFFF);
+            draw_colored_circle(renderer, { right_coll_pos.x, right_coll_pos.y + oppo.h}, 6, 0xFF00FFFF);
+
+            draw_colored_circle(renderer, player.pos, 3, 0xFF00FFFF);
+            draw_colored_circle(renderer, oppo.pos, 3, 0xFF00FFFF);
         
         }
 

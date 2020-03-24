@@ -5,6 +5,11 @@ struct Vec2 {
     T y;  
 };
 
+template <typename T>
+Vec2<T> constexpr vec2(T x, T y) {
+    return { x, y };
+}
+
 template<typename T>
 Vec2<T> constexpr operator + (Vec2<T> lhs, Vec2<T> rhs) {
     return { lhs.x + rhs.x, lhs.y + rhs.y };
