@@ -1,7 +1,7 @@
 # TO DO TODO
 
-* SDL_Rect should only be used for rendering
-    * Create a new type used everywhere outside of rendering
+* Introduce a 3x3 texture for the game border 
+    * Should use entity system 
 * Make the collision better
     * Based on the side of the collision, the vector should change
         * T/B: {  1, -1 }

@@ -23,14 +23,25 @@ struct CollisionRecord {
     Vec2f world_position;
 };
 
-bool paddle_ball_collision(const Paddle paddle, const Ball ball, CollisionRecord *record) {
-    auto hitbox = paddle.dstrect();
+bool paddle_ball_collision(const Entity *entity, const Ball *ball, CollisionRecord *record) {
+    auto hitbox = entity->dstrect();
 
-    auto dx = ball.pos.x - max(hitbox.x, min(ball.pos.x, hitbox.x + hitbox.w));
-    auto dy = ball.pos.y - max(hitbox.y, min(ball.pos.y, hitbox.y + hitbox.h));
+    auto dx = ball->pos.x - max(hitbox.x, min(ball->pos.x, hitbox.x + hitbox.w));
+    auto dy = ball->pos.y - max(hitbox.y, min(ball->pos.y, hitbox.y + hitbox.h));
 
-    record->world_position.x = ball.pos.x;
-    record->world_position.y = ball.pos.y;
+    record->world_position.x = ball->pos.x;
+    record->world_position.y = ball->pos.y;
     
-    return (dx * dx + dy * dy) < (ball.radius * ball.radius);
+    return (dx * dx + dy * dy) < (ball->radius * ball->radius);
+}
+
+void update_collision(std::vector<Entity*> entities, Ball *ball) {
+    for(const auto &entity: entities) {
+        if(entity == ball) continue;
+
+        CollisionRecord left_paddle_coll = {};
+        if(paddle_ball_collision(entity, ball, &left_paddle_coll)) {
+            ball->vel *= {-1, 1};
+        }
+    }
 }

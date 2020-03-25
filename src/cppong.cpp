@@ -118,24 +118,10 @@ int cppong_main() {
         if((ball.pos.y + ball.radius) > GAMEAREA.y + GAMEAREA.h || (ball.pos.y - ball.radius) < GAMEAREA.y)
             ball.vel *= {1, -1};
 
-        CollisionRecord left_paddle_coll = {};
-        if(paddle_ball_collision(player, ball, &left_paddle_coll)) {
-            left_coll_pos.x = player.pos.x + (player.w * 0.5f);
-            left_coll_pos.y = (left_paddle_coll.world_position.y - player.h);
-            ball.vel *= {-1, 1};
-        }
-            
-        CollisionRecord right_paddle_coll = {};
-        if(paddle_ball_collision(oppo, ball, &right_paddle_coll)) {
-            right_coll_pos.x = oppo.pos.x - (oppo.w * 0.5f);
-            right_coll_pos.y = (right_paddle_coll.world_position.y - oppo.h);
-            ball.vel *= {-1, 1};
-        }
+        update_collision(entities, &ball);
 
-        SDL_ErrorCheck(SDL_RenderClear(renderer));
-        SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x22, 0x22, 0x22, 0xFF));
-        
         render_entities(renderer, entities, spritesheet_texture);
+
         render_text(fc, renderer, "cppong++", 32, {(WINDOW_W * 0.5f), 0.0f });
         render_text(fc, renderer, "so much game",48, { (float)GAMEAREA.x, GAMEAREA.h + 48.0f});
 
@@ -143,14 +129,8 @@ int cppong_main() {
             draw_colored_rectangle(renderer, player.dstrect(), 0x0000FFFF);
             draw_colored_rectangle(renderer, oppo.dstrect(), 0xFFFFFFFF);
             draw_colored_rectangle(renderer, sdl_to_rect<float>(GAMEAREA), 0xFF0000FF);
-            draw_colored_circle(renderer, ball.pos, ball.radius, 0xFF00FFFF);
-            
-            draw_colored_circle(renderer, { left_coll_pos.x, left_coll_pos.y + player.h}, 6, 0xFF00FFFF);
-            draw_colored_circle(renderer, { right_coll_pos.x, right_coll_pos.y + oppo.h}, 6, 0xFF00FFFF);
 
-            draw_colored_circle(renderer, player.pos, 3, 0xFF00FFFF);
-            draw_colored_circle(renderer, oppo.pos, 3, 0xFF00FFFF);
-        
+            draw_colored_circle(renderer, ball.pos, ball.radius, 0xFF00FFFF);
         }
 
         SDL_RenderPresent(renderer);

@@ -28,6 +28,9 @@ SDL_Texture *load_texture_from_file(SDL_Renderer *renderer, const char* filename
 }
 
 void render_entities(SDL_Renderer *renderer, const std::vector<Entity *> &entities, SDL_Texture *spritesheet) {
+    SDL_ErrorCheck(SDL_RenderClear(renderer));
+    SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x22, 0x22, 0x22, 0xFF));
+
     for(const auto &entity: entities) {
         SDL_Rect dstrect = rect_to_sdl(entity->dstrect());
 
