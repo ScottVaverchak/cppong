@@ -120,6 +120,8 @@ int cppong_main() {
 
         update_collision(entities, &ball);
 
+        render_start(renderer);
+        render_border(renderer, GAMEAREA, spritesheet_texture);
         render_entities(renderer, entities, spritesheet_texture);
 
         render_text(fc, renderer, "cppong++", 32, {(WINDOW_W * 0.5f), 0.0f });

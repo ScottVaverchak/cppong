@@ -1,6 +1,6 @@
 # TO DO TODO
 
-* Introduce a 3x3 texture for the game border 
+* Introduce a 9slice texture for the game border 
     * Should use entity system 
 * Make the collision better
     * Based on the side of the collision, the vector should change

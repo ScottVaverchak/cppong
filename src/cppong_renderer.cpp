@@ -27,10 +27,12 @@ SDL_Texture *load_texture_from_file(SDL_Renderer *renderer, const char* filename
     return texture;
 }
 
-void render_entities(SDL_Renderer *renderer, const std::vector<Entity *> &entities, SDL_Texture *spritesheet) {
+void render_start(SDL_Renderer *renderer) {
     SDL_ErrorCheck(SDL_RenderClear(renderer));
     SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x22, 0x22, 0x22, 0xFF));
+}
 
+void render_entities(SDL_Renderer *renderer, const std::vector<Entity *> &entities, SDL_Texture *spritesheet) {
     for(const auto &entity: entities) {
         SDL_Rect dstrect = rect_to_sdl(entity->dstrect());
 
@@ -39,4 +41,11 @@ void render_entities(SDL_Renderer *renderer, const std::vector<Entity *> &entiti
                                         nullptr, entity->flipmode));
     
     }
+}
+
+void render_border(SDL_Renderer *renderer, SDL_Rect gamearea, SDL_Texture *spritesheet) {
+    SDL_Rect srcrect = { 16 * 2, 16 * 0, 16 * 3, 16 * 3 };
+    SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet, 
+                                    &srcrect, &gamearea, 0,  
+                                    nullptr, SDL_FLIP_NONE));
 }
