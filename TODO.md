@@ -4,16 +4,9 @@
     * Currently renders
     * Should use entity system 
 * Make the collision better
-    * https://gamedevelopment.tutsplus.com/tutorials/how-to-create-a-custom-2d-physics-engine-the-basics-and-impulse-resolution--gamedev-6331
-    * Based on the side of the collision, the vector should change
-        * T/B: {  1, -1 }
-        * L/R: { -1,  1 }
-    * Angle of the bounce should be depend on a few factors 
-        * Where did the ball hit the paddle 
-            * Currently tracking a very ditry and terrible position of collision
-            * 0.0f - 1.0f
-        * Was the paddle moving and for how long?
-            * This would allow "power" hits
+    * Angle is based on where the ball hits the paddle 
+    * Collision with the wall inverts the Y-axis 
+    * Physics dont exist in my world, dude.
 * Sprite sheets
     * sprite.sheet
         * filename

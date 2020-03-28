@@ -72,8 +72,6 @@ int cppong_main() {
     bool display_debug = true;
 
     SDL_Event e;
-    Vec2f left_coll_pos = {};
-    Vec2f right_coll_pos = {};
 
     Uint32 prev_dt = 1;
     
