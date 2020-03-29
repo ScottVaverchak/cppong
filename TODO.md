@@ -1,8 +1,5 @@
 # TO DO TODO
 
-* Introduce a 9slice texture for the game border 
-    * Currently renders
-    * Should use entity system 
 * Make the collision better
     * Angle is based on where the ball hits the paddle 
     * Collision with the wall inverts the Y-axis 
@@ -21,11 +18,8 @@
         * PauseState 
     * Game Over State 
         * SomeSickCreditsState
-* Text Rendering (-_-)
-    * Perhaps the fonts should be rendered to one large, square texture
-        * Will SDL optimize this to send it to the GPU only once?
 * Make this legit Modern C++ by guessing and hoping for the best 
-    * Book has been ordered 😎
     * Currently this is more C than Modern C++
     * The goal of this project is to learn Modern C++ I think
 * Switch to OpenGL for rendering 
+* Remove SDL lib for windows (get with it, Windows)
