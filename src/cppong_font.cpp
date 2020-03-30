@@ -1,26 +1,26 @@
 const int LOW_END_ASCII = 32;
 const int HIGH_END_ASCII = 122;
 
-struct CharTexture {
+struct CharTexture final {
     SDL_Texture *texture;
     int width;
     int height;
 };
 
-struct FontCache {
+struct FontCache final {
     CharTexture *char_textures;
     const char *font_location;
     float font_size;
 };
 
 void init_font_cache(FontCache **font_cache, const char *font_location, SDL_Renderer *renderer) {
-    FontCache *fc = new FontCache;
+    FontCache *fc { new FontCache };
     
     fc->char_textures = new CharTexture[HIGH_END_ASCII - LOW_END_ASCII];
     fc->font_location = font_location;
     fc->font_size = 32.0f;
 
-    TTF_Font *main_font = TTF_ErrorCheck(TTF_OpenFont(fc->font_location, fc->font_size));
+    TTF_Font *main_font { TTF_ErrorCheck(TTF_OpenFont(fc->font_location, fc->font_size)) };
 
     for(int ascii_code = LOW_END_ASCII; ascii_code <= HIGH_END_ASCII; ascii_code++) {
         const char *ch = new char[1]{(char)ascii_code};
@@ -29,7 +29,7 @@ void init_font_cache(FontCache **font_cache, const char *font_location, SDL_Rend
         SDL_Texture *font_texture = SDL_ErrorCheck(SDL_CreateTextureFromSurface(renderer, font_surface));
         SDL_FreeSurface(font_surface);
 
-        auto index  = ascii_code - 32;
+        auto index { ascii_code - 32 };
         int w, h;
         
         SDL_QueryTexture(font_texture, nullptr, nullptr, &w, &h);
@@ -45,12 +45,12 @@ void init_font_cache(FontCache **font_cache, const char *font_location, SDL_Rend
 
 
 void render_text(FontCache *font_cache, SDL_Renderer *renderer, const char *text, float font_size, Vec2f position) {
-    const size_t text_length = strlen(text);
-    float xoffset = 0;
-    const float aspect_ratio = font_size / font_cache->font_size;
-    const float padding = 2 * aspect_ratio;
+    const size_t text_length { strlen(text) };
+    float xoffset { 0 };
+    const float aspect_ratio { font_size / font_cache->font_size };
+    const float padding { 2.0f * aspect_ratio };
     for(int i = 0; i < text_length; i++) {
-        int ascii = (int)text[i];
+        int ascii { (int)text[i] };
         if(ascii < LOW_END_ASCII || ascii > HIGH_END_ASCII)
             continue;
 

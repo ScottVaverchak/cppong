@@ -68,12 +68,12 @@ int cppong_main() {
 
     SDL_Texture *spritesheet_texture = load_texture_from_file(renderer, "assets/spritesheet.png");
 
-    bool quit = false;
-    bool display_debug = true;
+    bool quit { false };
+    bool display_debug { true };
 
     SDL_Event e;
 
-    Uint32 prev_dt = 1;
+    Uint32 prev_dt { 1 };
     
     while (!quit) {
         Uint32 begin = SDL_GetTicks();
@@ -94,7 +94,7 @@ int cppong_main() {
         }
 
         const uint8_t *keyboard_state = SDL_GetKeyboardState(NULL);
-        int8_t dy = 0;
+        int8_t dy { 0 };
 
         if(keyboard_state[SDL_SCANCODE_UP]) {
             dy = -1;
@@ -135,7 +135,7 @@ int cppong_main() {
 
         SDL_RenderPresent(renderer);
         
-        const Uint32 dt = SDL_GetTicks() - begin;
+        const Uint32 dt { SDL_GetTicks() - begin };
         prev_dt = dt;
         
     }

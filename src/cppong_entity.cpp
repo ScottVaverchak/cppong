@@ -11,23 +11,23 @@ struct Entity {
     }
 };
 
-struct Paddle : Entity {
+struct Paddle final : Entity {
     Rectf hitbox;
 };
 
-struct Ball : Entity {
+struct Ball final : Entity {
     float radius;
 };
 
-struct CollisionRecord {
+struct CollisionRecord final {
     Vec2f world_position;
 };
 
 bool paddle_ball_collision(const Entity *entity, const Ball *ball, CollisionRecord *record) {
     auto hitbox = entity->dstrect();
 
-    auto dx = ball->pos.x - max(hitbox.x, min(ball->pos.x, hitbox.x + hitbox.w));
-    auto dy = ball->pos.y - max(hitbox.y, min(ball->pos.y, hitbox.y + hitbox.h));
+    auto dx { ball->pos.x - max(hitbox.x, min(ball->pos.x, hitbox.x + hitbox.w)) };
+    auto dy { ball->pos.y - max(hitbox.y, min(ball->pos.y, hitbox.y + hitbox.h)) };
 
     record->world_position.x = ball->pos.x;
     record->world_position.y = ball->pos.y;

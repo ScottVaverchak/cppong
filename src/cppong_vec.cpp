@@ -121,4 +121,4 @@ T min(T a, T b) {
     return a > b ? b : a;
 }
 
-const float PI = 3.141592f;
+const float PI { 3.141592f };

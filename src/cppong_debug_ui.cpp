@@ -31,11 +31,11 @@ void draw_colored_circle(SDL_Renderer *renderer, Vec2f position, int radius, uin
     const float segment_radians = (2.0f * PI) / segments;
 
     for(size_t i = 1; i <= segments; i++) {
-        const auto x = (sinf(i * segment_radians) * radius) + position.x;
-        const auto y = (cosf(i * segment_radians) * radius) + position.y;
+        const auto x { (sinf(i * segment_radians) * radius) + position.x };
+        const auto y { (cosf(i * segment_radians) * radius) + position.y };
 
-        const auto nx = (sinf((i + 1) * segment_radians) * radius) + position.x;
-        const auto ny = (cosf((i + 1) * segment_radians) * radius) + position.y;
+        const auto nx { (sinf((i + 1) * segment_radians) * radius) + position.x };
+        const auto ny { (cosf((i + 1) * segment_radians) * radius) + position.y };
 
         SDL_ErrorCheck(SDL_RenderDrawLine(renderer, x, y, nx, ny));
     }
