@@ -49,106 +49,151 @@ struct Spritesheet {
     const int tile_height;
 };
 
-void render_border(SDL_Renderer *renderer, SDL_Rect gamearea, Spritesheet *spritesheet) {
-    // @TODO(sjv): This looks like it could be optimized more
-    // @NOTE(sjv): Maybe this should be its own data struct for 9 slices
-
+void render_border(SDL_Renderer *renderer, SDL_Rect gamearea, Spritesheet *spritesheet, const Vec2<int> offset = {0, 0}) {
     SDL_Rect srctl { 
-        spritesheet->tile_width * 2, 
-        spritesheet->tile_height * 0, 
+        spritesheet->tile_width  * offset.x, // 2 
+        spritesheet->tile_height * offset.y, // 0
         spritesheet->tile_width, 
         spritesheet->tile_height 
     };
-    
+
     SDL_Rect srctm { 
-        spritesheet->tile_width * 3, 
-        spritesheet->tile_height * 0, 
+        spritesheet->tile_width  * (offset.x + 1), 
+        spritesheet->tile_height * offset.y, 
         spritesheet->tile_width, 
         spritesheet->tile_height 
     };
-    
+
     SDL_Rect srctr { 
-        spritesheet->tile_width * 4, 
-        spritesheet->tile_height * 0, 
+        spritesheet->tile_width  * (offset.x + 2), 
+        spritesheet->tile_height * offset.y, 
         spritesheet->tile_width, 
         spritesheet->tile_height 
     };
-    
+
     SDL_Rect srcml { 
-        spritesheet->tile_width * 2, 
-        spritesheet->tile_height * 1, 
+        spritesheet->tile_width  * offset.x, 
+        spritesheet->tile_height * (offset.y + 1), 
         spritesheet->tile_width, 
         spritesheet->tile_height 
     };
-    
+
     SDL_Rect srcmr { 
-        spritesheet->tile_width * 4, 
-        spritesheet->tile_height * 1, 
+        spritesheet->tile_width  * (offset.x + 2), 
+        spritesheet->tile_height * (offset.y + 1), 
         spritesheet->tile_width, 
         spritesheet->tile_height 
     };
-    
+
     SDL_Rect srcbl { 
-        spritesheet->tile_width * 2, 
-        spritesheet->tile_height * 2, 
+        spritesheet->tile_width  * offset.x, 
+        spritesheet->tile_height * (offset.y + 2), 
         spritesheet->tile_width, 
         spritesheet->tile_height 
     };
-    
+
     SDL_Rect srcbm { 
-        spritesheet->tile_width * 3, 
-        spritesheet->tile_height * 2, 
+        spritesheet->tile_width  * (offset.x + 1), 
+        spritesheet->tile_height * (offset.y + 2), 
         spritesheet->tile_width, 
         spritesheet->tile_height 
     };
-    
+
     SDL_Rect srcbr { 
-        spritesheet->tile_width * 4, 
-        spritesheet->tile_height * 2, 
+        spritesheet->tile_width  * (offset.x + 2), 
+        spritesheet->tile_height * (offset.y + 2), 
         spritesheet->tile_width, 
         spritesheet->tile_height 
     };
-    
+
 
     //  TOP
-    SDL_Rect dsttl {gamearea.x - 16, gamearea.y - 16, 16, 16};
+    SDL_Rect dsttl {
+        gamearea.x - spritesheet->tile_width, 
+        gamearea.y - spritesheet->tile_height, 
+        spritesheet->tile_width, 
+        spritesheet->tile_height
+    };
+
     SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet->texture, 
                                     &srctl, &dsttl, 0,  
                                     nullptr, SDL_FLIP_NONE));
 
-    SDL_Rect dsttm {gamearea.x, gamearea.y - 16, gamearea.w, 16};
+    SDL_Rect dsttm {
+        gamearea.x, 
+        gamearea.y - spritesheet->tile_height, 
+        gamearea.w, 
+        spritesheet->tile_height
+    };
+
     SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet->texture, 
                                     &srctm, &dsttm, 0,  
                                     nullptr, SDL_FLIP_NONE));
     
-    SDL_Rect dsttr {gamearea.x + gamearea.w, gamearea.y - 16, 16, 16};
+    SDL_Rect dsttr {
+        gamearea.x + gamearea.w, 
+        gamearea.y - spritesheet->tile_height, 
+        spritesheet->tile_width, 
+        spritesheet->tile_height
+    };
+
     SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet->texture, 
                                     &srctr, &dsttr, 0,  
                                     nullptr, SDL_FLIP_NONE));
 
     // MIDDLE
-    SDL_Rect dstml {gamearea.x - 16, gamearea.y, 16, gamearea.h};
+    SDL_Rect dstml {
+        gamearea.x - spritesheet->tile_width, 
+        gamearea.y, 
+        spritesheet->tile_width, 
+        gamearea.h
+    };
+
     SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet->texture, 
                                     &srcml, &dstml, 0,  
                                     nullptr, SDL_FLIP_NONE));
 
-    SDL_Rect dstmr {gamearea.x + gamearea.w, gamearea.y, 16, gamearea.h};
+    SDL_Rect dstmr {
+        gamearea.x + gamearea.w, 
+        gamearea.y, 
+        spritesheet->tile_width, 
+        gamearea.h
+    };
+
     SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet->texture, 
                                     &srcmr, &dstmr, 0,  
                                     nullptr, SDL_FLIP_NONE));
 
     // BOTTOM
-    SDL_Rect dstbl {gamearea.x - 16, gamearea.y + gamearea.h, 16, 16};
+    SDL_Rect dstbl {
+        gamearea.x - spritesheet->tile_width, 
+        gamearea.y + gamearea.h, 
+        spritesheet->tile_width, 
+        spritesheet->tile_height
+    };
+
     SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet->texture, 
                                     &srcbl, &dstbl, 0,  
                                     nullptr, SDL_FLIP_NONE));
 
-    SDL_Rect dstbm {gamearea.x, gamearea.y + gamearea.h, gamearea.w, 16};
+    SDL_Rect dstbm {
+        gamearea.x, 
+        gamearea.y + gamearea.h, 
+        gamearea.w, 
+        spritesheet->tile_height
+    };
+
     SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet->texture, 
                                     &srcbm, &dstbm, 0,  
                                     nullptr, SDL_FLIP_NONE));
 
-    SDL_Rect dstbr {gamearea.x + gamearea.w, gamearea.y + gamearea.h, 16, 16};
+    SDL_Rect dstbr {
+        gamearea.x + gamearea.w, 
+        gamearea.y + gamearea.h, 
+        spritesheet->tile_width, 
+        spritesheet->tile_height
+    };
+
     SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet->texture, 
                                     &srcbr, &dstbr, 0,  
                                     nullptr, SDL_FLIP_NONE));
