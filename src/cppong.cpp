@@ -67,7 +67,7 @@ int cppong_main() {
     init_font_cache(&fc, "assets/uni0553-webfont.ttf", renderer);
 
     SDL_Texture *spritesheet_texture = load_texture_from_file(renderer, "assets/spritesheet.png");
-
+    Spritesheet spritesheet = { spritesheet_texture, 16, 16 };
     bool quit { false };
     bool display_debug { true };
 
@@ -119,7 +119,7 @@ int cppong_main() {
         update_collision(entities, &ball);
 
         render_start(renderer);
-        render_border(renderer, GAMEAREA, spritesheet_texture);
+        render_border(renderer, GAMEAREA, &spritesheet);
         render_entities(renderer, entities, spritesheet_texture);
 
         render_text(fc, renderer, "cppong++", 32, {(WINDOW_W * 0.5f), 0.0f });

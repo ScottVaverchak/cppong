@@ -43,59 +43,113 @@ void render_entities(SDL_Renderer *renderer, const std::vector<Entity *> &entiti
     }
 }
 
-void render_border(SDL_Renderer *renderer, SDL_Rect gamearea, SDL_Texture *spritesheet) {
+struct Spritesheet {
+    SDL_Texture* texture;
+    const int tile_width;
+    const int tile_height;
+};
+
+void render_border(SDL_Renderer *renderer, SDL_Rect gamearea, Spritesheet *spritesheet) {
     // @TODO(sjv): This looks like it could be optimized more
     // @NOTE(sjv): Maybe this should be its own data struct for 9 slices
 
-    SDL_Rect srctl { 16 * 2, 16 * 0, 16, 16 };
-    SDL_Rect srctm { 16 * 3, 16 * 0, 16, 16 };
-    SDL_Rect srctr { 16 * 4, 16 * 0, 16, 16 };
-    SDL_Rect srcml { 16 * 2, 16 * 1, 16, 16 };
-    SDL_Rect srcmr { 16 * 4, 16 * 1, 16, 16 };
-    SDL_Rect srcbl { 16 * 2, 16 * 2, 16, 16 };
-    SDL_Rect srcbm { 16 * 3, 16 * 2, 16, 16 };
-    SDL_Rect srcbr { 16 * 4, 16 * 2, 16, 16 };
+    SDL_Rect srctl { 
+        spritesheet->tile_width * 2, 
+        spritesheet->tile_height * 0, 
+        spritesheet->tile_width, 
+        spritesheet->tile_height 
+    };
+    
+    SDL_Rect srctm { 
+        spritesheet->tile_width * 3, 
+        spritesheet->tile_height * 0, 
+        spritesheet->tile_width, 
+        spritesheet->tile_height 
+    };
+    
+    SDL_Rect srctr { 
+        spritesheet->tile_width * 4, 
+        spritesheet->tile_height * 0, 
+        spritesheet->tile_width, 
+        spritesheet->tile_height 
+    };
+    
+    SDL_Rect srcml { 
+        spritesheet->tile_width * 2, 
+        spritesheet->tile_height * 1, 
+        spritesheet->tile_width, 
+        spritesheet->tile_height 
+    };
+    
+    SDL_Rect srcmr { 
+        spritesheet->tile_width * 4, 
+        spritesheet->tile_height * 1, 
+        spritesheet->tile_width, 
+        spritesheet->tile_height 
+    };
+    
+    SDL_Rect srcbl { 
+        spritesheet->tile_width * 2, 
+        spritesheet->tile_height * 2, 
+        spritesheet->tile_width, 
+        spritesheet->tile_height 
+    };
+    
+    SDL_Rect srcbm { 
+        spritesheet->tile_width * 3, 
+        spritesheet->tile_height * 2, 
+        spritesheet->tile_width, 
+        spritesheet->tile_height 
+    };
+    
+    SDL_Rect srcbr { 
+        spritesheet->tile_width * 4, 
+        spritesheet->tile_height * 2, 
+        spritesheet->tile_width, 
+        spritesheet->tile_height 
+    };
+    
 
     //  TOP
     SDL_Rect dsttl {gamearea.x - 16, gamearea.y - 16, 16, 16};
-    SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet, 
+    SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet->texture, 
                                     &srctl, &dsttl, 0,  
                                     nullptr, SDL_FLIP_NONE));
 
     SDL_Rect dsttm {gamearea.x, gamearea.y - 16, gamearea.w, 16};
-    SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet, 
+    SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet->texture, 
                                     &srctm, &dsttm, 0,  
                                     nullptr, SDL_FLIP_NONE));
     
     SDL_Rect dsttr {gamearea.x + gamearea.w, gamearea.y - 16, 16, 16};
-    SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet, 
+    SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet->texture, 
                                     &srctr, &dsttr, 0,  
                                     nullptr, SDL_FLIP_NONE));
 
     // MIDDLE
     SDL_Rect dstml {gamearea.x - 16, gamearea.y, 16, gamearea.h};
-    SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet, 
+    SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet->texture, 
                                     &srcml, &dstml, 0,  
                                     nullptr, SDL_FLIP_NONE));
 
     SDL_Rect dstmr {gamearea.x + gamearea.w, gamearea.y, 16, gamearea.h};
-    SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet, 
+    SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet->texture, 
                                     &srcmr, &dstmr, 0,  
                                     nullptr, SDL_FLIP_NONE));
 
     // BOTTOM
     SDL_Rect dstbl {gamearea.x - 16, gamearea.y + gamearea.h, 16, 16};
-    SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet, 
+    SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet->texture, 
                                     &srcbl, &dstbl, 0,  
                                     nullptr, SDL_FLIP_NONE));
 
     SDL_Rect dstbm {gamearea.x, gamearea.y + gamearea.h, gamearea.w, 16};
-    SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet, 
+    SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet->texture, 
                                     &srcbm, &dstbm, 0,  
                                     nullptr, SDL_FLIP_NONE));
 
     SDL_Rect dstbr {gamearea.x + gamearea.w, gamearea.y + gamearea.h, 16, 16};
-    SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet, 
+    SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet->texture, 
                                     &srcbr, &dstbr, 0,  
                                     nullptr, SDL_FLIP_NONE));
 
