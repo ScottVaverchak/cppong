@@ -1,3 +1,9 @@
+struct Spritesheet {
+    SDL_Texture* texture;
+    const int tile_width;
+    const int tile_height;
+};
+
 SDL_Texture *load_texture_from_file(SDL_Renderer *renderer, const char* filename) {
 
     int image_width, image_height, image_channels;
@@ -43,16 +49,10 @@ void render_entities(SDL_Renderer *renderer, const std::vector<Entity *> &entiti
     }
 }
 
-struct Spritesheet {
-    SDL_Texture* texture;
-    const int tile_width;
-    const int tile_height;
-};
-
 void render_border(SDL_Renderer *renderer, SDL_Rect gamearea, Spritesheet *spritesheet, const Vec2<int> offset = {0, 0}) {
     SDL_Rect srctl { 
-        spritesheet->tile_width  * offset.x, // 2 
-        spritesheet->tile_height * offset.y, // 0
+        spritesheet->tile_width  * offset.x, 
+        spritesheet->tile_height * offset.y,
         spritesheet->tile_width, 
         spritesheet->tile_height 
     };
