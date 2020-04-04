@@ -30,11 +30,14 @@ const SDL_Rect GAMEAREA = {
     static_cast<int>(WINDOW_H * 0.75f)
 };
 
+Vec2f ball_spawn_pos = { 
+    GAMEAREA.x + (GAMEAREA.w * 0.5f), 
+    GAMEAREA.y + (GAMEAREA.h * 0.5f) 
+};
+
 int cppong_main() {
     printf("Initializing SDL...\n");
     GameState game_state = {};
-    game_state.player1_score = 1;
-    game_state.player2_score = 2;
 
     const int PLAYER_OFFSET_X = 10;
 
@@ -53,7 +56,7 @@ int cppong_main() {
     oppo.h = 16.0f * 3.0f;
 
     Ball ball = {};
-    ball.pos = { GAMEAREA.x + (GAMEAREA.w * 0.5f), GAMEAREA.y + (GAMEAREA.h * 0.5f) };
+    ball.pos = ball_spawn_pos;
     ball.srcrect = {0, 0, 16, 16};
     ball.vel = { 2, 0 };
     ball.w = ball.h = 16.0f;
@@ -120,8 +123,19 @@ int cppong_main() {
 
         ball.pos += ball.vel;
 
-        if((ball.pos.x + ball.radius) > GAMEAREA.x + GAMEAREA.w || (ball.pos.x - ball.radius) < GAMEAREA.x)
+        if((ball.pos.x + ball.radius) > GAMEAREA.x + GAMEAREA.w) {
             ball.vel *= {-1, 1};
+            ball.pos = ball_spawn_pos;
+            game_state.player1_score++;
+        }
+            
+
+        if ((ball.pos.x - ball.radius) < GAMEAREA.x) {
+            ball.pos = ball_spawn_pos;
+            ball.vel *= {-1, 1};
+            game_state.player2_score++;
+        }
+            
 
         if((ball.pos.y + ball.radius) > GAMEAREA.y + GAMEAREA.h || (ball.pos.y - ball.radius) < GAMEAREA.y)
             ball.vel *= {1, -1};
