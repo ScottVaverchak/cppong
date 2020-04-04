@@ -3,6 +3,7 @@
 #include <cassert>
 #include <iostream>
 #include <vector>
+#include <string>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -17,6 +18,11 @@
 const int WINDOW_W = 800;
 const int WINDOW_H = 400;
 
+struct GameState {
+    int player1_score;
+    int player2_score;
+};
+
 const SDL_Rect GAMEAREA = {
     static_cast<int>((WINDOW_W - (WINDOW_W * 0.9f)) * 0.5f),
     static_cast<int>((WINDOW_H - (WINDOW_H * 0.75f)) * 0.5f),
@@ -26,6 +32,10 @@ const SDL_Rect GAMEAREA = {
 
 int cppong_main() {
     printf("Initializing SDL...\n");
+    GameState game_state = {};
+    game_state.player1_score = 1;
+    game_state.player2_score = 2;
+
     const int PLAYER_OFFSET_X = 10;
 
     Paddle player = {};
@@ -123,6 +133,9 @@ int cppong_main() {
         render_entities(renderer, entities, spritesheet_texture);
 
         render_text(fc, renderer, "cppong++", 32, {(WINDOW_W * 0.5f), 0.0f });
+        render_text(fc, renderer, std::to_string(game_state.player1_score), 32, { 20.0f, 0.0f });
+        render_text(fc, renderer, std::to_string(game_state.player2_score), 32, { WINDOW_W - 20.0f - 32.0f, 0.0f });
+        
         render_text(fc, renderer, "so much game",48, { (float)GAMEAREA.x, GAMEAREA.h + 48.0f});
 
         if(display_debug) {

@@ -43,7 +43,6 @@ void init_font_cache(FontCache **font_cache, const char *font_location, SDL_Rend
     TTF_CloseFont(main_font);
 }
 
-
 void render_text(FontCache *font_cache, SDL_Renderer *renderer, const char *text, float font_size, Vec2f position) {
     const size_t text_length { strlen(text) };
     float xoffset { 0 };
@@ -62,4 +61,8 @@ void render_text(FontCache *font_cache, SDL_Renderer *renderer, const char *text
 
         SDL_RenderCopy(renderer, char_texture.texture, nullptr, &location);
     }
+}
+
+void render_text(FontCache *font_cache, SDL_Renderer *renderer, std::string text, float font_size, Vec2f position) {
+    render_text(font_cache, renderer, text.c_str(), font_size, position);
 }
