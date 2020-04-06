@@ -18,9 +18,17 @@
 const int WINDOW_W = 800;
 const int WINDOW_H = 400;
 
+enum class GameGameState {
+    CountDown,
+    InGame,
+    PlayerWon
+};
+
 struct GameState {
     int player1_score;
     int player2_score;
+
+    GameGameState state;
 };
 
 const SDL_Rect GAMEAREA = {
@@ -38,6 +46,7 @@ Vec2f ball_spawn_pos = {
 int cppong_main() {
     printf("Initializing SDL...\n");
     GameState game_state = {};
+    game_state.state = GameGameState::CountDown;
 
     const int PLAYER_OFFSET_X = 10;
 
@@ -121,26 +130,38 @@ int cppong_main() {
             oppo.pos.y += dy * 2;
         }
 
-        ball.pos += ball.vel;
+        switch(game_state.state) {
+            case(GameGameState::CountDown): {
 
-        if((ball.pos.x + ball.radius) > GAMEAREA.x + GAMEAREA.w) {
-            ball.vel *= {-1, 1};
-            ball.pos = ball_spawn_pos;
-            game_state.player1_score++;
+            } break;
+            case(GameGameState::InGame): {
+                ball.pos += ball.vel;
+
+                if((ball.pos.x + ball.radius) > GAMEAREA.x + GAMEAREA.w) {
+                    ball.vel *= {-1, 1};
+                    ball.pos = ball_spawn_pos;
+                    game_state.player1_score++;
+                }
+                    
+
+                if ((ball.pos.x - ball.radius) < GAMEAREA.x) {
+                    ball.pos = ball_spawn_pos;
+                    ball.vel *= {-1, 1};
+                    game_state.player2_score++;
+                }
+                    
+
+                if((ball.pos.y + ball.radius) > GAMEAREA.y + GAMEAREA.h || (ball.pos.y - ball.radius) < GAMEAREA.y)
+                    ball.vel *= {1, -1};
+
+                update_collision(entities, &ball);
+            } break;
+            case(GameGameState::PlayerWon): {
+
+            } break;
         }
-            
 
-        if ((ball.pos.x - ball.radius) < GAMEAREA.x) {
-            ball.pos = ball_spawn_pos;
-            ball.vel *= {-1, 1};
-            game_state.player2_score++;
-        }
-            
-
-        if((ball.pos.y + ball.radius) > GAMEAREA.y + GAMEAREA.h || (ball.pos.y - ball.radius) < GAMEAREA.y)
-            ball.vel *= {1, -1};
-
-        update_collision(entities, &ball);
+        
 
         render_start(renderer);
         render_border(renderer, GAMEAREA, &spritesheet, {2, 0});
