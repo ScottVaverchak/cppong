@@ -110,6 +110,22 @@ int cppong_main() {
                     case SDLK_d: {
                         display_debug = !display_debug;
                     } break;
+
+                    case SDLK_z: {
+                        if(display_debug) {
+                            switch(game_state.state) {
+                                case(GameGameState::CountDown): {
+                                    game_state.state = GameGameState::InGame;
+                                } break;
+                                case(GameGameState::InGame): {
+                                    game_state.state = GameGameState::PlayerWon;
+                                } break;
+                                case(GameGameState::PlayerWon): {
+                                    game_state.state = GameGameState::CountDown;
+                                } break;
+                            }
+                        }
+                    } break;
                 }
             }
 
@@ -161,8 +177,6 @@ int cppong_main() {
             } break;
         }
 
-        
-
         render_start(renderer);
         render_border(renderer, GAMEAREA, &spritesheet, {2, 0});
         render_entities(renderer, entities, spritesheet_texture);
@@ -171,7 +185,18 @@ int cppong_main() {
         render_text(fc, renderer, std::to_string(game_state.player1_score), 32, { 20.0f, 0.0f });
         render_text(fc, renderer, std::to_string(game_state.player2_score), 32, { WINDOW_W - 20.0f - 32.0f, 0.0f });
         
-        render_text(fc, renderer, "so much game",48, { (float)GAMEAREA.x, GAMEAREA.h + 48.0f});
+        std::string name;
+        switch(game_state.state) {
+            case(GameGameState::CountDown): {
+                name = "CountDown";                
+            } break;
+            case(GameGameState::InGame): {
+                name = "InGame";
+            } break;
+            case(GameGameState::PlayerWon): {
+                name = "PlayerWon";
+            } break;
+        }
 
         if(display_debug) {
             draw_colored_rectangle(renderer, player.dstrect(), 0x0000FFFF);
@@ -179,6 +204,7 @@ int cppong_main() {
             draw_colored_rectangle(renderer, sdl_to_rect<float>(GAMEAREA), 0xFF0000FF);
 
             draw_colored_circle(renderer, ball.pos, ball.radius, 0xFF00FFFF);
+            render_text(fc, renderer, name,48, { (float)GAMEAREA.x, GAMEAREA.h + 48.0f});
         }
 
         SDL_RenderPresent(renderer);
