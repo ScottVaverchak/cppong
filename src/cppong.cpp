@@ -96,6 +96,7 @@ int cppong_main() {
     SDL_Event e;
 
     Uint32 prev_dt { 1 };
+    float dt = 0.0f;
     
     while (!quit) {
         Uint32 begin = SDL_GetTicks();
@@ -146,6 +147,7 @@ int cppong_main() {
             oppo.pos.y += dy * 2;
         }
 
+
         switch(game_state.state) {
             case(GameGameState::CountDown): {
 
@@ -158,7 +160,6 @@ int cppong_main() {
                     ball.pos = ball_spawn_pos;
                     game_state.player1_score++;
                 }
-                    
 
                 if ((ball.pos.x - ball.radius) < GAMEAREA.x) {
                     ball.pos = ball_spawn_pos;
@@ -166,7 +167,6 @@ int cppong_main() {
                     game_state.player2_score++;
                 }
                     
-
                 if((ball.pos.y + ball.radius) > GAMEAREA.y + GAMEAREA.h || (ball.pos.y - ball.radius) < GAMEAREA.y)
                     ball.vel *= {1, -1};
 
@@ -209,8 +209,10 @@ int cppong_main() {
 
         SDL_RenderPresent(renderer);
         
-        const Uint32 dt { SDL_GetTicks() - begin };
-        prev_dt = dt;
+        const Uint32 idt { SDL_GetTicks() - begin };
+        dt = (float)idt / 1000.0f;
+
+        prev_dt = idt;
         
     }
 
