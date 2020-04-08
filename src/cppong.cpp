@@ -15,72 +15,66 @@
 #include "cppong_entity.cpp"
 #include "cppong_renderer.cpp"
 
-const int WINDOW_W = 800;
-const int WINDOW_H = 400;
-
-enum class GameGameState {
-    CountDown,
-    InGame,
-    PlayerWon
-};
-
-struct GameState {
-    int player1_score;
-    int player2_score;
-
-    GameGameState state;
-};
-
-const SDL_Rect GAMEAREA = {
-    static_cast<int>((WINDOW_W - (WINDOW_W * 0.9f)) * 0.5f),
-    static_cast<int>((WINDOW_H - (WINDOW_H * 0.75f)) * 0.5f),
-    static_cast<int>(WINDOW_W * 0.9f),
-    static_cast<int>(WINDOW_H * 0.75f)
-};
-
-Vec2f ball_spawn_pos = { 
-    GAMEAREA.x + (GAMEAREA.w * 0.5f), 
-    GAMEAREA.y + (GAMEAREA.h * 0.5f) 
-};
-
 int cppong_main() {
     printf("Initializing SDL...\n");
-    GameState game_state = {};
-    game_state.state = GameGameState::CountDown;
+    World world = {};
+    world.state = GameGameState::CountDown;
+    world.window_w = 800;
+    world.window_h = 600;
+    world.gamearea = {
+        static_cast<int>((world.window_w - (world.window_w * 0.9f)) * 0.5f),
+        static_cast<int>((world.window_h - (world.window_h * 0.75f)) * 0.5f),
+        static_cast<int>(world.window_w * 0.9f),
+        static_cast<int>(world.window_h * 0.75f)
+    };
 
     const int PLAYER_OFFSET_X = 10;
 
     Paddle player = {};
-    player.pos = { (float)(GAMEAREA.x + PLAYER_OFFSET_X), GAMEAREA.h * 0.5f };
+    player.pos = { (float)(world.gamearea.x + PLAYER_OFFSET_X), world.gamearea.h * 0.5f };
     player.hitbox = rect(player.pos, 24.0f, 60.0f);
     player.srcrect = {16, 0, 16, 16 * 3};
+    player.speed = 100.0f;
     player.w = 16.0f;
     player.h = 16.0f * 3.0f;
 
     Paddle oppo = {};
-    oppo.pos = { (float)(GAMEAREA.x + GAMEAREA.w) - PLAYER_OFFSET_X, GAMEAREA.h * 0.5f };
+    oppo.pos = { (float)(world.gamearea.x + world.gamearea.w) - PLAYER_OFFSET_X, world.gamearea.h * 0.5f };
     oppo.hitbox = rect(oppo.pos, 24.0f, 60.0f);
     oppo.srcrect = {16, 0, 16, 16 * 3};
+    oppo.speed = 100.0f;
     oppo.w = 16.0f;
     oppo.h = 16.0f * 3.0f;
 
     Ball ball = {};
-    ball.pos = ball_spawn_pos;
+    ball.spawn_pos = { 
+        world.gamearea.x + (world.gamearea.w * 0.5f), 
+        world.gamearea.y + (world.gamearea.h * 0.5f) 
+    };
+    ball.pos = ball.spawn_pos;
     ball.srcrect = {0, 0, 16, 16};
     ball.vel = { 2, 0 };
     ball.w = ball.h = 16.0f;
     ball.radius = 16.0f * 0.5f;
 
-    std::vector<Entity*> entities = { &player, &oppo, &ball};
+    std::vector<Entity*> entities = { &player, &oppo, &ball };
+    
+    // @TODO(sjv): We will want a way to set resolution?
+    // @TODO(sjv): Can we get the supported resolutions / aspect ratio for the screen?
+
+    const Uint32 window_flags = 0; // SDL_WINDOW_FULLSCREEN;
+
+    // SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
 
     SDL_ErrorCheck(SDL_Init(SDL_INIT_VIDEO));
     SDL_Window *window = SDL_ErrorCheck(SDL_CreateWindow("cppong", 
                                                           SDL_WINDOWPOS_UNDEFINED, 
                                                           SDL_WINDOWPOS_UNDEFINED, 
-                                                          WINDOW_W, WINDOW_H, 
-                                                          SDL_WINDOW_RESIZABLE));
+                                                          world.window_w, world.window_h, 
+                                                          window_flags));
   
     SDL_Renderer *renderer = SDL_ErrorCheck(SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED));
+
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
 
     TTF_ErrorCheck(TTF_Init());    
@@ -91,7 +85,6 @@ int cppong_main() {
     SDL_Texture *spritesheet_texture = load_texture_from_file(renderer, "assets/spritesheet.png");
     Spritesheet spritesheet = { spritesheet_texture, 16, 16 };
     bool quit { false };
-    bool display_debug { true };
 
     SDL_Event e;
 
@@ -109,20 +102,20 @@ int cppong_main() {
             if (e.type == SDL_KEYUP) {
                 switch(e.key.keysym.sym) {
                     case SDLK_d: {
-                        display_debug = !display_debug;
+                        world.display_debug = !world.display_debug;
                     } break;
 
                     case SDLK_z: {
-                        if(display_debug) {
-                            switch(game_state.state) {
+                        if(world.display_debug) {
+                            switch(world.state) {
                                 case(GameGameState::CountDown): {
-                                    game_state.state = GameGameState::InGame;
+                                    world.state = GameGameState::InGame;
                                 } break;
                                 case(GameGameState::InGame): {
-                                    game_state.state = GameGameState::PlayerWon;
+                                    world.state = GameGameState::PlayerWon;
                                 } break;
                                 case(GameGameState::PlayerWon): {
-                                    game_state.state = GameGameState::CountDown;
+                                    world.state = GameGameState::CountDown;
                                 } break;
                             }
                         }
@@ -133,7 +126,7 @@ int cppong_main() {
         }
 
         const uint8_t *keyboard_state = SDL_GetKeyboardState(NULL);
-        int8_t dy { 0 };
+        float dy { 0 };
 
         if(keyboard_state[SDL_SCANCODE_UP]) {
             dy = -1;
@@ -141,79 +134,19 @@ int cppong_main() {
             dy = 1;
         }
 
-        if((player.dstrect().y + dy) >= GAMEAREA.y && (player.dstrect().y + dy + player.dstrect().h) < GAMEAREA.y + GAMEAREA.h)
+        if((player.dstrect().y + dy) >= world.gamearea.y && (player.dstrect().y + dy + player.dstrect().h) < world.gamearea.y + world.gamearea.h)
         {
-            player.pos.y += dy * 2;
-            oppo.pos.y += dy * 2;
+            player.pos.y += dy * dt * player.speed;
+            oppo.pos.y += dy * dt * player.speed;
         }
 
-
-        switch(game_state.state) {
-            case(GameGameState::CountDown): {
-
-            } break;
-            case(GameGameState::InGame): {
-                ball.pos += ball.vel;
-
-                if((ball.pos.x + ball.radius) > GAMEAREA.x + GAMEAREA.w) {
-                    ball.vel *= {-1, 1};
-                    ball.pos = ball_spawn_pos;
-                    game_state.player1_score++;
-                }
-
-                if ((ball.pos.x - ball.radius) < GAMEAREA.x) {
-                    ball.pos = ball_spawn_pos;
-                    ball.vel *= {-1, 1};
-                    game_state.player2_score++;
-                }
-                    
-                if((ball.pos.y + ball.radius) > GAMEAREA.y + GAMEAREA.h || (ball.pos.y - ball.radius) < GAMEAREA.y)
-                    ball.vel *= {1, -1};
-
-                update_collision(entities, &ball);
-            } break;
-            case(GameGameState::PlayerWon): {
-
-            } break;
-        }
-
-        render_start(renderer);
-        render_border(renderer, GAMEAREA, &spritesheet, {2, 0});
-        render_entities(renderer, entities, spritesheet_texture);
-
-        render_text(fc, renderer, "cppong++", 32, {(WINDOW_W * 0.5f), 0.0f });
-        render_text(fc, renderer, std::to_string(game_state.player1_score), 32, { 20.0f, 0.0f });
-        render_text(fc, renderer, std::to_string(game_state.player2_score), 32, { WINDOW_W - 20.0f - 32.0f, 0.0f });
-        
-        std::string name;
-        switch(game_state.state) {
-            case(GameGameState::CountDown): {
-                name = "CountDown";                
-            } break;
-            case(GameGameState::InGame): {
-                name = "InGame";
-            } break;
-            case(GameGameState::PlayerWon): {
-                name = "PlayerWon";
-            } break;
-        }
-
-        if(display_debug) {
-            draw_colored_rectangle(renderer, player.dstrect(), 0x0000FFFF);
-            draw_colored_rectangle(renderer, oppo.dstrect(), 0xFFFFFFFF);
-            draw_colored_rectangle(renderer, sdl_to_rect<float>(GAMEAREA), 0xFF0000FF);
-
-            draw_colored_circle(renderer, ball.pos, ball.radius, 0xFF00FFFF);
-            render_text(fc, renderer, name,48, { (float)GAMEAREA.x, GAMEAREA.h + 48.0f});
-        }
-
-        SDL_RenderPresent(renderer);
+        update_world(&world, &ball, entities, dt);
+        render_world(&world, renderer, entities, &spritesheet, fc, dt);
         
         const Uint32 idt { SDL_GetTicks() - begin };
         dt = (float)idt / 1000.0f;
 
         prev_dt = idt;
-        
     }
 
     printf("Exiting gracefully... :)\n");

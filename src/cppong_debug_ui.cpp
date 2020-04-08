@@ -27,7 +27,7 @@ void draw_colored_circle(SDL_Renderer *renderer, Vec2f position, int radius, uin
 
     const int segments = 8;
     assert(segments >= 3);
-
+    
     const float segment_radians = (2.0f * PI) / segments;
 
     for(size_t i = 1; i <= segments; i++) {

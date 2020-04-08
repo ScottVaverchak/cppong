@@ -200,3 +200,39 @@ void render_border(SDL_Renderer *renderer, SDL_Rect gamearea, Spritesheet *sprit
 
 }
 
+void render_world(World *world, SDL_Renderer *renderer, const std::vector<Entity *> &entities, Spritesheet *spritesheet, FontCache *fc, float dt) {
+    render_start(renderer);
+    render_border(renderer, rect_to_sdl(world->gamearea), spritesheet, {2, 0});
+    render_entities(renderer, entities, spritesheet->texture);
+
+    render_text(fc, renderer, "cppong++", 32, {(world->window_w * 0.5f), 0.0f });
+    render_text(fc, renderer, std::to_string(world->player1_score), 32, { 20.0f, 0.0f });
+    render_text(fc, renderer, std::to_string(world->player2_score), 32, { world->window_w - 20.0f - 32.0f, 0.0f });
+    
+    std::string name;
+    switch(world->state) {
+        case(GameGameState::CountDown): {
+            name = "CountDown";                
+        } break;
+        case(GameGameState::InGame): {
+            name = "InGame";
+        } break;
+        case(GameGameState::PlayerWon): {
+            name = "PlayerWon";
+        } break;
+    }
+
+    if(world->display_debug) {
+        draw_colored_rectangle(renderer, rect_cast<float>(world->gamearea), 0xFF0000FF);
+        for(const auto &entity: entities) {
+            if(Paddle *p = dynamic_cast<Paddle *>(entity)) {
+                draw_colored_rectangle(renderer, p->dstrect(), 0x0000FFFF);
+            } else if(Ball *b = dynamic_cast<Ball *>(entity)) {
+                draw_colored_circle(renderer, b->pos, b->radius, 0xFF00FFFF);
+            } 
+        }
+        render_text(fc, renderer, name, 48, { (float)world->gamearea.x, world->gamearea.h + 48.0f});
+    }
+
+    SDL_RenderPresent(renderer);
+}

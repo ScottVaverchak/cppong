@@ -48,8 +48,17 @@ SDL_Rect rect_to_sdl(Rect<float> rect) {
     };
 }
 
+SDL_Rect constexpr rect_to_sdl(Rect<int> rect) {
+    return { 
+        rect.x,
+        rect.y,
+        rect.w,
+        rect.h,
+    };
+}
+
 template <typename T>
-Rect<T> sdl_to_rect(SDL_Rect rect) {
+Rect<T> constexpr sdl_to_rect(SDL_Rect rect) {
     return {
         (T) rect.x, 
         (T) rect.y,
@@ -58,4 +67,15 @@ Rect<T> sdl_to_rect(SDL_Rect rect) {
     };
 }
 
+template <typename U, typename T>
+Rect<U> constexpr rect_cast(Rect<T> rect) {
+    return {
+        (U) rect.x,
+        (U) rect.y,
+        (U) rect.w,
+        (U) rect.h
+    };
+}
+
 using Rectf = Rect<float>;
+using Recti = Rect<int>;
