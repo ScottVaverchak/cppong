@@ -1,4 +1,21 @@
 
+void draw_solid_rectangle(SDL_Renderer *renderer, Rectf rect, uint32_t color) {
+
+    Uint8 r, g, b, a;
+    SDL_ErrorCheck(SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a));
+    
+    SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 
+        (color & 0xFF000000) >> 24, 
+        (color & 0x00FF0000) >> 16, 
+        (color & 0x0000FF00) >> 8, 
+        (color & 0x000000FF)));
+
+    auto sdl_rect = rect_to_sdl(rect);
+    
+    SDL_ErrorCheck(SDL_RenderFillRect(renderer, &sdl_rect));
+    SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, r, g, b, a));
+}
+
 void draw_colored_rectangle(SDL_Renderer *renderer, Rectf rect, uint32_t color) {
 
     Uint8 r, g, b, a;

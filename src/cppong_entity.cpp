@@ -1,9 +1,11 @@
 enum class GameGameState {
     CountDown,
     InGame,
-    PlayerWon
+    Paused, 
+    PlayerScored
 };
 
+// @TODO(sjv): Switch this over to a class and allow methods to do all the work?
 struct World {
     int player1_score;
     int player2_score;
@@ -13,6 +15,26 @@ struct World {
 
     int window_w, window_h;
     bool display_debug;
+
+    float countDownCounter;
+
+    void SetGameState(GameGameState gameState) {
+        if(state == gameState) return;
+
+        state = gameState;
+        switch(state) {
+            case(GameGameState::CountDown): {
+                // Set up the ball position
+                countDownCounter = 3.0f;
+            } break;
+            case(GameGameState::InGame): {
+            } break;
+            case(GameGameState::Paused): {
+            } break;
+            case(GameGameState::PlayerScored): {
+            } break;
+        }
+    }
 };
 
 struct Entity {
@@ -73,8 +95,15 @@ void update_collision(std::vector<Entity*> const entities, Ball *ball) {
 }
 
 void update_world(World *world, Ball *ball, std::vector<Entity*> const &entities, float dt) {
+
     switch(world->state) {
         case(GameGameState::CountDown): {
+            if(world->countDownCounter <= 0.0f) {
+                world->state = GameGameState::InGame;
+                break;
+            }
+
+            world->countDownCounter -= dt;
 
         } break;
         case(GameGameState::InGame): {
@@ -84,12 +113,14 @@ void update_world(World *world, Ball *ball, std::vector<Entity*> const &entities
                 ball->vel *= {-1, 1};
                 ball->pos = ball->spawn_pos;
                 world->player1_score++;
+                world->SetGameState(GameGameState::CountDown);
             }
 
             if ((ball->pos.x - ball->radius) < world->gamearea.x) {
                 ball->pos = ball->spawn_pos;
                 ball->vel *= {-1, 1};
                 world->player2_score++;
+                world->SetGameState(GameGameState::CountDown);
             }
                 
             if((ball->pos.y + ball->radius) > world->gamearea.y + world->gamearea.h || (ball->pos.y - ball->radius) < world->gamearea.y)
@@ -97,7 +128,10 @@ void update_world(World *world, Ball *ball, std::vector<Entity*> const &entities
 
             update_collision(entities, ball);
         } break;
-        case(GameGameState::PlayerWon): {
+        case(GameGameState::Paused): {
+
+        } break;
+        case(GameGameState::PlayerScored): {
 
         } break;
     }

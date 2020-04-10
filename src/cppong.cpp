@@ -18,7 +18,7 @@
 int cppong_main() {
     printf("Initializing SDL...\n");
     World world = {};
-    world.state = GameGameState::CountDown;
+    world.state = GameGameState::InGame;
     world.window_w = 800;
     world.window_h = 600;
     world.gamearea = {
@@ -75,6 +75,7 @@ int cppong_main() {
   
     SDL_Renderer *renderer = SDL_ErrorCheck(SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED));
 
+    SDL_ErrorCheck(SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND));
     SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
 
     TTF_ErrorCheck(TTF_Init());    
@@ -105,6 +106,14 @@ int cppong_main() {
                         world.display_debug = !world.display_debug;
                     } break;
 
+                    case SDLK_ESCAPE: {
+                        if(world.state == GameGameState::InGame) {
+                            world.state = GameGameState::Paused;
+                        } else if(world.state == GameGameState::Paused) {
+                            world.state = GameGameState::InGame;
+                        }
+                    } break;
+
                     case SDLK_z: {
                         if(world.display_debug) {
                             switch(world.state) {
@@ -112,9 +121,12 @@ int cppong_main() {
                                     world.state = GameGameState::InGame;
                                 } break;
                                 case(GameGameState::InGame): {
-                                    world.state = GameGameState::PlayerWon;
+                                    world.state = GameGameState::Paused;
                                 } break;
-                                case(GameGameState::PlayerWon): {
+                                case(GameGameState::Paused): {
+                                    world.state = GameGameState::PlayerScored;
+                                } break;
+                                case(GameGameState::PlayerScored): {
                                     world.state = GameGameState::CountDown;
                                 } break;
                             }
@@ -127,11 +139,13 @@ int cppong_main() {
 
         const uint8_t *keyboard_state = SDL_GetKeyboardState(NULL);
         float dy { 0 };
-
-        if(keyboard_state[SDL_SCANCODE_UP]) {
-            dy = -1;
-        } else if (keyboard_state[SDL_SCANCODE_DOWN]) {
-            dy = 1;
+        
+        if(world.state != GameGameState::Paused) {
+            if(keyboard_state[SDL_SCANCODE_UP]) {
+                dy = -1;
+            } else if (keyboard_state[SDL_SCANCODE_DOWN]) {
+                dy = 1;
+            }
         }
 
         if((player.dstrect().y + dy) >= world.gamearea.y && (player.dstrect().y + dy + player.dstrect().h) < world.gamearea.y + world.gamearea.h)

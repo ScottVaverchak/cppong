@@ -212,13 +212,32 @@ void render_world(World *world, SDL_Renderer *renderer, const std::vector<Entity
     std::string name;
     switch(world->state) {
         case(GameGameState::CountDown): {
+            Vec2f count_dims = {};
+            
+            auto count = std::to_string(((int)world->countDownCounter) + 1);
+
+            string_texture_dims(fc, count, 128, count_dims);
+            Vec2f pos1 = { (world->window_w * 0.5f) - (count_dims.x * 0.5f), (world->window_w * 0.5f) - count_dims.y - 50.0f };
+            render_text(fc, renderer, count, 128, pos1);
+
             name = "CountDown";                
         } break;
         case(GameGameState::InGame): {
             name = "InGame";
         } break;
-        case(GameGameState::PlayerWon): {
-            name = "PlayerWon";
+        case(GameGameState::Paused): {
+            Vec2f dims = {};
+            
+            string_texture_dims(fc, "paused", 128, dims);
+            Vec2f pos = { (world->window_w * 0.5f) - (dims.x * 0.5f), (world->window_w * 0.5f) - dims.y };
+            render_text(fc, renderer, "paused", 128, pos + 5.0f);
+            draw_solid_rectangle(renderer, {0.0f, 0.0f, (float)world->window_w, (float)world->window_h}, 0x03030388);
+            render_text(fc, renderer, "paused", 128, pos);
+
+            name = "Paused";
+        } break;
+        case(GameGameState::PlayerScored): {
+            name = "PlayerScored";
         } break;
     }
 

@@ -3,8 +3,8 @@ const int HIGH_END_ASCII = 122;
 
 struct CharTexture final {
     SDL_Texture *texture;
-    int width;
-    int height;
+    float width;
+    float height;
 };
 
 struct FontCache final {
@@ -18,7 +18,7 @@ void init_font_cache(FontCache **font_cache, const char *font_location, SDL_Rend
     
     fc->char_textures = new CharTexture[HIGH_END_ASCII - LOW_END_ASCII];
     fc->font_location = font_location;
-    fc->font_size = 32.0f;
+    fc->font_size = 128.0f;
 
     TTF_Font *main_font { TTF_ErrorCheck(TTF_OpenFont(fc->font_location, fc->font_size)) };
 
@@ -65,4 +65,31 @@ void render_text(FontCache *font_cache, SDL_Renderer *renderer, const char *text
 
 void render_text(FontCache *font_cache, SDL_Renderer *renderer, std::string text, float font_size, Vec2f position) {
     render_text(font_cache, renderer, text.c_str(), font_size, position);
+}
+
+void string_texture_dims(FontCache *font_cache, const char *text, float font_size, Vec2f &dims) {
+    float height { 0 };
+    float width { 0 };
+
+    const float aspect_ratio { font_size / font_cache->font_size };
+    const float padding { 2.0f * aspect_ratio };
+
+    for(int i = 0; i < strlen(text); i++) {
+        int ascii { (int)text[i] };
+        if(ascii < LOW_END_ASCII || ascii > HIGH_END_ASCII)
+            continue;
+
+        CharTexture char_texture = font_cache->char_textures[ascii - 32];
+
+        width += (char_texture.width * aspect_ratio) + padding;
+        if((char_texture.height * aspect_ratio) > height)
+            height = char_texture.height * aspect_ratio;
+    }
+
+    dims.x = width - padding;
+    dims.y = height;
+}
+
+void string_texture_dims(FontCache *font_cache, std::string text, float font_size, Vec2f &dims) {
+    string_texture_dims(font_cache, text.c_str(), font_size, dims);
 }
