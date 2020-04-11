@@ -1,21 +1,5 @@
 # TO DO TODO
 
-* "GameState" for game
-    * Implement States:
-        * CountDown
-            * Complete for now
-        * Playing
-            * Complete
-        * Paused
-            * Complete
-        * PlayerScored
-            * Is this state needed?
-* Sounds 
-    * Beeps
-    * Boops
-    * Bops
-* Physics engine
-    * Ground up physics engine
 * Graphics 
     * High resolution main gfx
     * Drop shadow
@@ -32,7 +16,17 @@
     * Option for start screen
 * Switch to OpenGL for rendering
 * GameState Update
+    * "GameState" for game
     * Make use of animations 
+    * Implement States:
+        * PlayerScored
+            * Animation heavy "Player X scored!"
+* Sounds 
+    * Beeps
+    * Boops
+    * Bops
+* Physics engine
+    * Ground up physics engine    
 
 # BUGS
 
