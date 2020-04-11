@@ -33,7 +33,7 @@ int cppong_main() {
     Paddle player = {};
     player.pos = { (float)(world.gamearea.x + PLAYER_OFFSET_X), world.gamearea.h * 0.5f };
     player.hitbox = rect(player.pos, 24.0f, 60.0f);
-    player.srcrect = {16, 0, 16, 16 * 3};
+    player.srcrect = {0, 0, 16 * 2, 16 * 6};
     player.speed = 100.0f;
     player.w = 16.0f;
     player.h = 16.0f * 3.0f;
@@ -41,7 +41,7 @@ int cppong_main() {
     Paddle oppo = {};
     oppo.pos = { (float)(world.gamearea.x + world.gamearea.w) - PLAYER_OFFSET_X, world.gamearea.h * 0.5f };
     oppo.hitbox = rect(oppo.pos, 24.0f, 60.0f);
-    oppo.srcrect = {16, 0, 16, 16 * 3};
+    oppo.srcrect = {0, 0, 16 * 2, 16 * 6};
     oppo.speed = 100.0f;
     oppo.w = 16.0f;
     oppo.h = 16.0f * 3.0f;
@@ -52,7 +52,7 @@ int cppong_main() {
         world.gamearea.y + (world.gamearea.h * 0.5f) 
     };
     ball.pos = ball.spawn_pos;
-    ball.srcrect = {0, 0, 16, 16};
+    ball.srcrect = {16 * 2, 16 * 3, 16 * 2, 16 * 2};
     ball.vel = { 2, 0 };
     ball.w = ball.h = 16.0f;
     ball.radius = 16.0f * 0.5f;

@@ -35,12 +35,19 @@ SDL_Texture *load_texture_from_file(SDL_Renderer *renderer, const char* filename
 
 void render_start(SDL_Renderer *renderer) {
     SDL_ErrorCheck(SDL_RenderClear(renderer));
-    SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x22, 0x22, 0x22, 0xFF));
+    SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x77, 0x77, 0x99, 0xFF));
 }
 
-void render_entities(SDL_Renderer *renderer, const std::vector<Entity *> &entities, SDL_Texture *spritesheet) {
+void render_entities(SDL_Renderer *renderer, const World *world, const std::vector<Entity *> &entities, SDL_Texture *spritesheet) {
     for(const auto &entity: entities) {
         SDL_Rect dstrect = rect_to_sdl(entity->dstrect());
+        
+        if(Paddle *p = dynamic_cast<Paddle *>(entity)) {
+            // 2 * ((x - 0) / (100 - 0)) - 1
+            // world->gamearea
+            auto y = 2 * ((entity->pos.y - world->gamearea.y) / ((world->gamearea.h + world->gamearea.y) - world->gamearea.y)) - 1.0f;
+            draw_solid_rectangle(renderer, entity->dstrect().offset(-y * 5.0f ), 0x000000FF);
+        } 
 
         SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet, 
                                         &entity->srcrect, &dstrect, 0, 
@@ -203,7 +210,7 @@ void render_border(SDL_Renderer *renderer, SDL_Rect gamearea, Spritesheet *sprit
 void render_world(World *world, SDL_Renderer *renderer, const std::vector<Entity *> &entities, Spritesheet *spritesheet, FontCache *fc, float dt) {
     render_start(renderer);
     render_border(renderer, rect_to_sdl(world->gamearea), spritesheet, {2, 0});
-    render_entities(renderer, entities, spritesheet->texture);
+    render_entities(renderer, world, entities, spritesheet->texture);
 
     render_text(fc, renderer, "cppong++", 32, {(world->window_w * 0.5f), 0.0f });
     render_text(fc, renderer, std::to_string(world->player1_score), 32, { 20.0f, 0.0f });
@@ -249,6 +256,8 @@ void render_world(World *world, SDL_Renderer *renderer, const std::vector<Entity
             } else if(Ball *b = dynamic_cast<Ball *>(entity)) {
                 draw_colored_circle(renderer, b->pos, b->radius, 0xFF00FFFF);
             } 
+
+            draw_colored_circle(renderer, entity->pos, 5, 0xFF00FFFF);
         }
         render_text(fc, renderer, name, 48, { (float)world->gamearea.x, world->gamearea.h + 48.0f});
     }
