@@ -1,11 +1,10 @@
 # TO DO TODO
 
 * Graphics 
-    * High resolution main gfx
-    * Drop shadow
-        * Static
-        * Based on position 
-            * Assume main direction light is 1 unit above (z) the game area
+    * Shadow for ball is not working since we would need to change the pixel values
+        * This would be eaiser with shaders
+        * Another option is to create a second spritesheet that is tinted at startup
+            * Spritesheet struct could have another Texture for "shadow"
 * Basic Animations
     * Curves based animations for:
         * Fade
@@ -27,6 +26,7 @@
     * Bops
 * Physics engine
     * Ground up physics engine    
+
 
 # BUGS
 

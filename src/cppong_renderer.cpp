@@ -54,7 +54,7 @@ void render_entities(SDL_Renderer *renderer, const World *world, const std::vect
                 entity->dstrect().h
             );
 
-            draw_solid_rectangle(renderer, shadowdst, 0x000000FF);
+            draw_solid_rectangle(renderer, shadowdst, 0x00000033);
         } 
 
         SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet, 
