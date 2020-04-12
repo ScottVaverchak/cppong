@@ -41,6 +41,8 @@ struct Entity {
     Vec2f pos;
     Vec2f vel;
 
+    Vec2f forward;
+
     float w, h;
     float speed;
 

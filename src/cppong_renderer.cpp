@@ -46,7 +46,15 @@ void render_entities(SDL_Renderer *renderer, const World *world, const std::vect
             // 2 * ((x - 0) / (100 - 0)) - 1
             // world->gamearea
             auto y = 2 * ((entity->pos.y - world->gamearea.y) / ((world->gamearea.h + world->gamearea.y) - world->gamearea.y)) - 1.0f;
-            draw_solid_rectangle(renderer, entity->dstrect().offset(-y * 5.0f ), 0x000000FF);
+            
+            auto shadowdst = rect(
+                entity->dstrect().x + (entity->forward.x * 2.0f) , 
+                entity->dstrect().y + (y * 5.0f), 
+                entity->dstrect().w, 
+                entity->dstrect().h
+            );
+
+            draw_solid_rectangle(renderer, shadowdst, 0x000000FF);
         } 
 
         SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet, 

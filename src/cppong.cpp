@@ -37,6 +37,7 @@ int cppong_main() {
     player.speed = 100.0f;
     player.w = 16.0f;
     player.h = 16.0f * 3.0f;
+    player.forward = {1.0f, 0.0f};
 
     Paddle oppo = {};
     oppo.pos = { (float)(world.gamearea.x + world.gamearea.w) - PLAYER_OFFSET_X, world.gamearea.h * 0.5f };
@@ -45,6 +46,7 @@ int cppong_main() {
     oppo.speed = 100.0f;
     oppo.w = 16.0f;
     oppo.h = 16.0f * 3.0f;
+    oppo.forward = {-1.0f, 0.0f};
 
     Ball ball = {};
     ball.spawn_pos = { 

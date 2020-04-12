@@ -2,14 +2,14 @@ template <typename T>
 struct Rect {
     T x, y, w, h;
 
-    Rect<T> offset(T off) {
-        return {
-            x + off, 
-            y + off,
-            w, 
-            h
-        };
-    }
+    // Rect<T> offset(T off) {
+    //     return {
+    //         x + off, 
+    //         y + off,
+    //         w, 
+    //         h
+    //     };
+    // }
 };
 
 template <typename T>
