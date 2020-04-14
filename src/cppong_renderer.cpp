@@ -1,5 +1,7 @@
 struct Spritesheet {
     SDL_Texture* texture;
+    SDL_Texture* shadow;
+
     const int tile_width;
     const int tile_height;
 };
@@ -38,26 +40,25 @@ void render_start(SDL_Renderer *renderer) {
     SDL_ErrorCheck(SDL_SetRenderDrawColor(renderer, 0x77, 0x77, 0x99, 0xFF));
 }
 
-void render_entities(SDL_Renderer *renderer, const World *world, const std::vector<Entity *> &entities, SDL_Texture *spritesheet) {
+void render_entities(SDL_Renderer *renderer, const World *world, const std::vector<Entity *> &entities, Spritesheet *spritesheet) {
     for(const auto &entity: entities) {
         SDL_Rect dstrect = rect_to_sdl(entity->dstrect());
-        
-        if(Paddle *p = dynamic_cast<Paddle *>(entity)) {
-            // 2 * ((x - 0) / (100 - 0)) - 1
-            // world->gamearea
-            auto y = 2 * ((entity->pos.y - world->gamearea.y) / ((world->gamearea.h + world->gamearea.y) - world->gamearea.y)) - 1.0f;
-            
-            auto shadowdst = rect(
-                entity->dstrect().x + (entity->forward.x * 2.0f) , 
-                entity->dstrect().y + (y * 5.0f), 
-                entity->dstrect().w, 
-                entity->dstrect().h
-            );
+      
+        auto y = clamp_neg_1_to_1(entity->pos.y, world->gamearea.y, world->gamearea.h + world->gamearea.y);
+        auto x = clamp_neg_1_to_1(entity->pos.x, world->gamearea.x, world->gamearea.w + world->gamearea.x);
 
-            draw_solid_rectangle(renderer, shadowdst, 0x00000033);
-        } 
+        SDL_Rect shadowdst = {
+            (int)floorf(entity->dstrect().x - (x * 2.0f)),
+            (int)floorf(entity->dstrect().y - (y * 5.0f)),
+            (int)floorf(entity->dstrect().w),
+            (int)floorf(entity->dstrect().h) 
+        };
 
-        SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet, 
+        SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet->shadow, 
+                                        &entity->srcrect, &shadowdst, 0, 
+                                        nullptr, entity->flipmode));
+
+        SDL_ErrorCheck(SDL_RenderCopyEx(renderer, spritesheet->texture, 
                                         &entity->srcrect, &dstrect, 0, 
                                         nullptr, entity->flipmode));
     
@@ -218,7 +219,7 @@ void render_border(SDL_Renderer *renderer, SDL_Rect gamearea, Spritesheet *sprit
 void render_world(World *world, SDL_Renderer *renderer, const std::vector<Entity *> &entities, Spritesheet *spritesheet, FontCache *fc, float dt) {
     render_start(renderer);
     render_border(renderer, rect_to_sdl(world->gamearea), spritesheet, {2, 0});
-    render_entities(renderer, world, entities, spritesheet->texture);
+    render_entities(renderer, world, entities, spritesheet);
 
     render_text(fc, renderer, "cppong++", 32, {(world->window_w * 0.5f), 0.0f });
     render_text(fc, renderer, std::to_string(world->player1_score), 32, { 20.0f, 0.0f });

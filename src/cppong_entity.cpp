@@ -5,7 +5,6 @@ enum class GameGameState {
     PlayerScored
 };
 
-// @TODO(sjv): Switch this over to a class and allow methods to do all the work?
 struct World {
     int player1_score;
     int player2_score;

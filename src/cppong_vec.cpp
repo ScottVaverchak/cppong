@@ -121,4 +121,8 @@ T constexpr min(T a, T b) {
     return a > b ? b : a;
 }
 
+float clamp_neg_1_to_1(float x, float min, float max) {
+    return 2.0f * ((x - min) / (max - 0.0f)) - 1.0f;
+}
+
 const float PI { 3.141592f };

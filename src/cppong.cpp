@@ -86,7 +86,11 @@ int cppong_main() {
     init_font_cache(&fc, "assets/uni0553-webfont.ttf", renderer);
 
     SDL_Texture *spritesheet_texture = load_texture_from_file(renderer, "assets/spritesheet.png");
-    Spritesheet spritesheet = { spritesheet_texture, 16, 16 };
+    SDL_Texture *shadow_texture = load_texture_from_file(renderer, "assets/spritesheet.png");
+    SDL_ErrorCheck(SDL_SetTextureColorMod(shadow_texture, 0x00, 0x00, 0x00));
+    SDL_ErrorCheck(SDL_SetTextureAlphaMod(shadow_texture, 0x33));
+    Spritesheet spritesheet = { spritesheet_texture, shadow_texture, 16, 16 };
+    
     bool quit { false };
 
     SDL_Event e;
