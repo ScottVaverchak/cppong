@@ -1,5 +1,9 @@
 # TO DO TODO
-
+* Basic Animations
+    * Curves based animations for:
+        * Fade
+        * Zoom 
+* Basic AI 
 * Implement Mouse
     * Mouse over in debug 
         * Show:
@@ -8,11 +12,6 @@
             * Brain
                 * AI
                 * Player
-* Basic Animations
-    * Curves based animations for:
-        * Fade
-        * Zoom 
-* Basic AI 
 * Start screen
 * Switch to OpenGL for rendering
 * UI
