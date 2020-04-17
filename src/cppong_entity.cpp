@@ -1,29 +1,3 @@
-enum class AnimationState {
-    Play,
-    Stop
-};
-
-struct Animation {
-    float total_time;
-    float remaining_time;
-
-    AnimationState state;
-
-    void start() {
-        state = AnimationState::Play;
-        remaining_time = total_time;
-    }
-
-    void update(float dt) {
-        remaining_time -= dt;
-
-        if(remaining_time < 0.0f) {
-            remaining_time = 0.0f;
-            state = AnimationState::Stop;
-        }
-    }
-};
-
 // @NOTE(sjv): smarter peope would argue that the word could be considered an entity
 enum class GameGameState {
     CountDown,
