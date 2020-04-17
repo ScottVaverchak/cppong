@@ -1,3 +1,10 @@
+struct Animation {
+    float total_time;
+    float remaining_time;
+};
+
+// @NOTE(sjv): smarter peope would argue that the word could be considered an entity
+
 enum class GameGameState {
     CountDown,
     InGame,
