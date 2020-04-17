@@ -55,7 +55,7 @@ int cppong_main() {
     };
     ball.pos = ball.spawn_pos;
     ball.srcrect = {16 * 2, 16 * 3, 16 * 2, 16 * 2};
-    ball.vel = { 2, 0 };
+    ball.vel = { 3, 2 };
     ball.w = ball.h = 16.0f;
     ball.radius = 16.0f * 0.5f;
 
@@ -157,7 +157,17 @@ int cppong_main() {
         if((player.dstrect().y + dy) >= world.gamearea.y && (player.dstrect().y + dy + player.dstrect().h) < world.gamearea.y + world.gamearea.h)
         {
             player.pos.y += dy * dt * player.speed;
-            oppo.pos.y += dy * dt * player.speed;
+        }
+
+        float ody { 0 };
+        if(oppo.pos.y > ball.pos.y) {
+            ody = -1;
+        } else if(oppo.pos.y < ball.pos.y) {
+            ody = 1;
+        }
+
+        if((oppo.dstrect().y + ody) >= world.gamearea.y && (oppo.dstrect().y + ody + oppo.dstrect().h) < world.gamearea.y + world.gamearea.h) {
+            oppo.pos.y += ody * dt * oppo.speed;
         }
 
         update_world(&world, &ball, entities, dt);
