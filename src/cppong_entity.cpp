@@ -18,6 +18,9 @@ struct World {
 
     float countDownCounter;
 
+    int mouse_x;
+    int mouse_y;
+
     void SetGameState(GameGameState gameState) {
         if(state == gameState) return;
 

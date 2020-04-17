@@ -154,6 +154,8 @@ int cppong_main() {
             }
         }
 
+        SDL_GetMouseState(&world.mouse_x, &world.mouse_y); 
+
         if((player.dstrect().y + dy) >= world.gamearea.y && (player.dstrect().y + dy + player.dstrect().h) < world.gamearea.y + world.gamearea.h)
         {
             player.pos.y += dy * dt * player.speed;

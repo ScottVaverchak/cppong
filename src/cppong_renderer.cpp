@@ -269,6 +269,14 @@ void render_world(World *world, SDL_Renderer *renderer, const std::vector<Entity
             draw_colored_circle(renderer, entity->pos, 5, 0xFF00FFFF);
         }
         render_text(fc, renderer, name, 48, { (float)world->gamearea.x, world->gamearea.h + 48.0f});
+        
+        draw_colored_rectangle(renderer, 
+            { 
+                static_cast<float>(world->mouse_x), 
+                static_cast<float>(world->mouse_y), 
+                10.0f, 
+                10.0f
+            }, 0x0000FFFF);
     }
 
     SDL_RenderPresent(renderer);
