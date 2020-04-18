@@ -270,12 +270,13 @@ void render_world(World *world, SDL_Renderer *renderer, const std::vector<Entity
         }
         render_text(fc, renderer, name, 48, { (float)world->gamearea.x, world->gamearea.h + 48.0f});
         
+        auto halfcs = 5.0f;
         draw_colored_rectangle(renderer, 
             { 
-                static_cast<float>(world->mouse_x), 
-                static_cast<float>(world->mouse_y), 
-                10.0f, 
-                10.0f
+                static_cast<float>(world->mouse_x) - halfcs, 
+                static_cast<float>(world->mouse_y) - halfcs, 
+                halfcs * 2.0f, 
+                halfcs * 2.0f
             }, 0x0000FFFF);
     }
 

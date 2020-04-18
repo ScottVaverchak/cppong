@@ -67,7 +67,7 @@ int cppong_main() {
     const Uint32 window_flags = 0; // SDL_WINDOW_FULLSCREEN;
 
     // SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
-
+    SDL_ErrorCheck(SDL_ShowCursor(SDL_DISABLE));
     SDL_ErrorCheck(SDL_Init(SDL_INIT_VIDEO));
     SDL_Window *window = SDL_ErrorCheck(SDL_CreateWindow("cppong", 
                                                           SDL_WINDOWPOS_UNDEFINED, 
@@ -93,7 +93,7 @@ int cppong_main() {
     
     bool quit { false };
 
-    SDL_Event e;
+    SDL_Event event;
 
     Uint32 prev_dt { 1 };
     float dt = 0.0f;
@@ -101,46 +101,52 @@ int cppong_main() {
     while (!quit) {
         Uint32 begin = SDL_GetTicks();
 
-        while (SDL_PollEvent(&e)) {
-            if (e.type == SDL_QUIT) {
-                quit = true;
-            } 
+        while (SDL_PollEvent(&event)) {
+            switch(event.type) {
+                case SDL_QUIT: {
+                    quit = true;
+                } break;
 
-            if (e.type == SDL_KEYUP) {
-                switch(e.key.keysym.sym) {
-                    case SDLK_d: {
-                        world.display_debug = !world.display_debug;
-                    } break;
+                case SDL_MOUSEMOTION: {
+                    world.mouse_x = event.motion.x;
+                    world.mouse_y = event.motion.y;
+                } break;
 
-                    case SDLK_ESCAPE: {
-                        if(world.state == GameGameState::InGame) {
-                            world.state = GameGameState::Paused;
-                        } else if(world.state == GameGameState::Paused) {
-                            world.state = GameGameState::InGame;
-                        }
-                    } break;
+                case SDL_KEYUP: {
+                    switch(event.key.keysym.sym) {
+                        case SDLK_d: {
+                            world.display_debug = !world.display_debug;
+                        } break;
 
-                    case SDLK_z: {
-                        if(world.display_debug) {
-                            switch(world.state) {
-                                case(GameGameState::CountDown): {
-                                    world.state = GameGameState::InGame;
-                                } break;
-                                case(GameGameState::InGame): {
-                                    world.state = GameGameState::Paused;
-                                } break;
-                                case(GameGameState::Paused): {
-                                    world.state = GameGameState::PlayerScored;
-                                } break;
-                                case(GameGameState::PlayerScored): {
-                                    world.state = GameGameState::CountDown;
-                                } break;
+                        case SDLK_ESCAPE: {
+                            if(world.state == GameGameState::InGame) {
+                                world.state = GameGameState::Paused;
+                            } else if(world.state == GameGameState::Paused) {
+                                world.state = GameGameState::InGame;
                             }
-                        }
-                    } break;
-                }
-            }
+                        } break;
 
+                        case SDLK_z: {
+                            if(world.display_debug) {
+                                switch(world.state) {
+                                    case(GameGameState::CountDown): {
+                                        world.state = GameGameState::InGame;
+                                    } break;
+                                    case(GameGameState::InGame): {
+                                        world.state = GameGameState::Paused;
+                                    } break;
+                                    case(GameGameState::Paused): {
+                                        world.state = GameGameState::PlayerScored;
+                                    } break;
+                                    case(GameGameState::PlayerScored): {
+                                        world.state = GameGameState::CountDown;
+                                    } break;
+                                }
+                            }
+                        } break;
+                    }
+                } break;
+            }
         }
 
         const uint8_t *keyboard_state = SDL_GetKeyboardState(NULL);
@@ -154,7 +160,7 @@ int cppong_main() {
             }
         }
 
-        SDL_GetMouseState(&world.mouse_x, &world.mouse_y); 
+        // SDL_GetMouseState(&world.mouse_x, &world.mouse_y); 
 
         if((player.dstrect().y + dy) >= world.gamearea.y && (player.dstrect().y + dy + player.dstrect().h) < world.gamearea.y + world.gamearea.h)
         {
