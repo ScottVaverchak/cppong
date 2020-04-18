@@ -1,13 +1,12 @@
 # TO DO TODO
 
-* Implement Mouse
-    * Mouse over in debug 
-        * Show:
-            * Velocity
-            * Position
-            * Brain
-                * AI
-                * Player
+* Mouse over in debug 
+    * Show:
+        * Velocity
+        * Position
+        * Brain
+            * AI
+            * Player
 * Basic Animations
     * Curves based animations for:
         * Fade
@@ -32,7 +31,3 @@
     * Bops
 * Physics engine
     * Ground up physics engine    
-
-# BUGS
-
-* BlendMode stuff
