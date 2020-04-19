@@ -166,10 +166,12 @@ int cppong_main() {
         }
 
         float ody { 0 };
-        if(oppo.pos.y > ball.pos.y) {
-            ody = -1;
-        } else if(oppo.pos.y < ball.pos.y) {
-            ody = 1;
+        if(world.state != GameGameState::Paused) {
+            if(oppo.pos.y > ball.pos.y) {
+                ody = -1;
+            } else if(oppo.pos.y < ball.pos.y) {
+                ody = 1;
+            }
         }
 
         if((oppo.dstrect().y + ody) >= world.gamearea.y && (oppo.dstrect().y + ody + oppo.dstrect().h) < world.gamearea.y + world.gamearea.h) {
