@@ -259,6 +259,10 @@ void render_world(World *world, SDL_Renderer *renderer, const std::vector<Entity
 
     if(world->display_debug) {
         draw_colored_rectangle(renderer, rect_cast<float>(world->gamearea), 0xFF0000FF);
+        auto halfcs = 5.0f;
+
+        Vec2f mouse_pos = { static_cast<float>(world->mouse_x) - halfcs, static_cast<float>(world->mouse_y) - halfcs};
+        
         for(const auto &entity: entities) {
             if(Paddle *p = dynamic_cast<Paddle *>(entity)) {
                 draw_colored_rectangle(renderer, p->dstrect(), 0x0000FFFF);
@@ -267,17 +271,23 @@ void render_world(World *world, SDL_Renderer *renderer, const std::vector<Entity
             } 
 
             draw_colored_circle(renderer, entity->pos, 5, 0xFF00FFFF);
+
+            if(rect_contains_point(entity->dstrect(), mouse_pos)) {
+                auto dst = entity->dstrect();
+                draw_colored_rectangle(renderer, { dst.x - 5.0f, dst.y - 5.0f, dst.w + 10.0f, dst.h + 10.0f }, 0xFF00FFFF);
+            }
+            
         }
+
         render_text(fc, renderer, name, 48, { (float)world->gamearea.x, world->gamearea.h + 48.0f});
-        
-        auto halfcs = 5.0f;
         draw_colored_rectangle(renderer, 
             { 
-                static_cast<float>(world->mouse_x) - halfcs, 
-                static_cast<float>(world->mouse_y) - halfcs, 
+                mouse_pos.x, 
+                mouse_pos.y, 
                 halfcs * 2.0f, 
                 halfcs * 2.0f
             }, 0x0000FFFF);
+
     }
 
     SDL_RenderPresent(renderer);

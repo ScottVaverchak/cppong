@@ -77,5 +77,11 @@ Rect<U> constexpr rect_cast(Rect<T> rect) {
     };
 }
 
+template <typename T>
+bool rect_contains_point(Rect<T> rect, Vec2<T> vec) {
+    return vec.x >= rect.x && vec.x <= rect.x + rect.w &&
+            vec.y >= rect.y && vec.y <= rect.y + rect.h;
+}
+
 using Rectf = Rect<float>;
 using Recti = Rect<int>;
